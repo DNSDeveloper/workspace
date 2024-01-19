@@ -7,6 +7,7 @@ use App\Attendance;
 use App\DailyReport;
 use App\Holiday;
 use App\Rules\DateRange;
+use App\Task;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -47,10 +48,14 @@ class AttendanceController extends Controller
     // Opens view for attendance register form
     public function create() {
         $employee = Auth::user()->employee;
+        $tasks = Task::where('employee_id',$employee->id)
+        ->whereIn('status',['on progress','open'])
+        ->get();
         $data = [
             'employee' => $employee,
             'attendance' => null,
-            'registered_attendance' => null
+            'registered_attendance' => null,
+            'tasks'=> $tasks
         ];
         // $last_attendance = $employee->attendance;
         $last_attendance = Attendance::where('employee_id',auth()->user()->employee->id)
@@ -147,7 +152,9 @@ class AttendanceController extends Controller
             'report'=> $request->report,
             'ask'=> $request->ask,
             'employee_id'=> $request->employee_id,
+            'task_id'=> $request->task_id
         ]);
+        dd($reports);
         
         
         $attendance = Attendance::findOrFail($attendance_id);

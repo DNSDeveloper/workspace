@@ -12,7 +12,8 @@ class DailyReport extends Model
     protected $fillable = [
         'report',
         'ask',
-        'employee_id'
+        'employee_id',
+        'task_id'
     ];
 
     public function employee(){

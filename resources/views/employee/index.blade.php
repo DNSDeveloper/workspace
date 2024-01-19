@@ -78,6 +78,7 @@
                   <th scope="col">Task</th>
                   <th scope="col">Deadline</th>
                   <th scope="col">Status</th>
+                  <th scope="col">Detail</th>
                 </tr>
               </thead>
               <tbody>
@@ -90,7 +91,12 @@
                     <span class="badge badge-{{ $task->status == 'open' ? 'primary' : 'warning' }}">{{ ucwords($task->status)
                       }}</span>
                   </td>
-                  <td></td>
+                  <td>
+                    <a class="btn btn-warning" href="{{ route('employee.task.detail',$task->id) }}">
+                      <i class="fas fa-eye">
+                      </i>
+                    </a>
+                  </td>
                 </tr>
                 @endforeach
                 @foreach ($subtask as $sub)
@@ -100,6 +106,9 @@
                       <td>{{ $sub->deadline }}</td>
                       <td> <span class="badge badge-{{ $sub->status == 'open' ? 'primary' : 'warning' }}">{{ ucwords($sub->status)
                       }}</span></td>
+                      <td><a class="btn btn-warning" href="{{ route('employee.task') }}">
+                      <i class="fas fa-eye"></i>  
+                      </a></td>
                     </tr>
                 @endforeach
               </tbody>

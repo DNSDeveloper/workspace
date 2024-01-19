@@ -7,6 +7,7 @@ use App\EmployeeTaskToEmployee;
 use App\Http\Controllers\Controller;
 use App\Subtask;
 use App\Task;
+use App\Unit;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -21,7 +22,8 @@ class TaskController extends Controller
         ->whereNotIn('status',['done','cancel'])
         ->get();
         $employees = Employee::whereNotIn('id',[$id])->get();
-        return view('employee.task.index', compact('tasks', 'employees','subtasks'));
+        $units = Unit::get();
+        return view('employee.task.index', compact('units','tasks', 'employees','subtasks'));
     }
 
     public function update_task(Request $request, $id)
@@ -68,6 +70,28 @@ class TaskController extends Controller
     }
 
     public function store(Request $request) {
+        $task = Task::create([
+            'employee_id' => auth()->user()->employee->id,
+            'user_id' => auth()->user()->id,
+            'task' => $request->task,
+            'note' => $request->note,
+            'category'=> $request->category,
+            'deadline' => date('Y-m-d H:i:s', strtotime($request->deadline)),
+            'is_priority' => $request->is_priority,
+            'unit_id' => $request->unit,
+            'service_id'=> $request->service,
+            'status'=> 'open'
+        ]);
+        if ($task) {
+            $request->session()->flash('success', "Task Berhasil ditambahkan");
+        } else {
+            $request->session()->flash('error', "Task Gagal Ditambahkan");
+        }
+
+        return redirect()->back();
+    }
+
+    public function store_subtask(Request $request) {
         if($request->file('file')) {
             $destinationPath = 'task/subtask';
             $typefile = $request->file->getClientOriginalExtension();

@@ -117,5 +117,6 @@ Route::namespace('Employee')->prefix('employee')->name('employee.')->middleware(
     Route::post('/update-subtask/{id}','TaskController@update_subtask')->name('subtask.update');
     Route::get('/task/history','TaskController@history')->name('task.history');
     Route::post('/task/store','TaskController@store')->name('task.store');
+    Route::post('/subtask/store','TaskController@store_subtask')->name('subtask.store');
     Route::get('/task/detail/{id}','TaskController@detail')->name('task.detail');
 });
