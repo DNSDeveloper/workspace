@@ -32,6 +32,8 @@
     <link rel="stylesheet" href="/plugins/datatables-responsive/css/responsive.bootstrap4.min.css" />
     <!-- daterange picker -->
     <link rel="stylesheet" href="/plugins/daterangepicker/daterangepicker.css">
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
     {{--
     <link rel="stylesheet" href="/css/daterangepicker.css"> --}}
     <style>
@@ -42,6 +44,10 @@
         .proftable tr td:first-child {
             font-weight: bold;
             color: rgb(11, 72, 138);
+        }
+        .select2-selection__choice {
+            background-color: blue;
+            color: white;
         }
     </style>
 </head>
@@ -83,8 +89,6 @@
             @endif
 
             @endguest
-
-
             <!-- jQuery -->
             <script src="/plugins/jquery/jquery.min.js"></script>
             <!-- jQuery UI 1.11.4 -->
@@ -118,8 +122,15 @@
             <script src="/plugins/inputmask/min/jquery.inputmask.bundle.min.js"></script>
             <!-- date-range-picker -->
             <script src="/plugins/daterangepicker/daterangepicker.js"></script>
+            <script src="/plugins/select2/js/select2.full.min.js"></script>
             {{-- <script src="/js/daterangepicker.js"></script> --}}
             {{-- <script src="/js/moment.min.js"></script> --}}
+            <script>
+                $(function() {
+                    // $('#select2').select2()
+                    $('#summernote').summernote()
+                })
+            </script>
             @yield('extra-js')
         </body>
 

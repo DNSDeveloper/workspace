@@ -25,6 +25,7 @@
 <section class="content">
     <div class="container-fluid">
         <div class="card">
+            @include('messages.alerts')
             <div class="card-body">
                 <nav>
                     <div class="nav nav-tabs d-flex justify-content-around" id="nav-tab" role="tablist">
@@ -123,6 +124,12 @@
                                 </tr>
                             </tbody>
                         </table>
+                        @if ($task->is_approved == '0')
+                        <form action="{{ route('admin.task.approved',$task->id) }}" method="post">
+                            @csrf
+                            <button type="submit" class="btn btn-success float-right"> <i class="fas fa-check"></i> Approved</button>
+                        </form>
+                        @endif
                     </div>
                     <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
                         <h4 class="mt-3">Subtask</h4>
@@ -163,7 +170,7 @@
                                                         110%
                                                     </div>
                                                     @elseif(($subtask->completed_time != null) &&
-                                                    date('Y-m-d H:i:s',strtotime($subtask->completed_time) ==
+                                                    (date('Y-m-d H:i:s',strtotime($subtask->completed_time)) ==
                                                     date('Y-m-d H:i:s',strtotime($subtask->deadline)) ))
                                                     <div class="badge badge-primary">
                                                         100%

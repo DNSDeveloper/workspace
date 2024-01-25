@@ -27,6 +27,7 @@ class CreateAttendancesTable extends Migration
             $table->string('jam_pulang')->nullable();
             $table->string('time')->nullable();
             $table->string('status')->nullable();
+            $table->string('keterangan')->nullable();
             $table->timestamps();
         });
     }

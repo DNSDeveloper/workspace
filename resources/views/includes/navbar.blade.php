@@ -17,19 +17,20 @@
         <li class="nav-item dropdown user user-menu">
             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
                 @if (Auth::user()->employee)
-                <img src="/storage/{{ Auth::user()->employee->photo }}" class="user-image img-circle elevation-2 alt="User Image">
+                <img src="{{ asset( Auth::user()->employee->photo) }}" class="user-image img-circle elevation-2 alt="User Image">
                 @else
-                <img src="/dist/img/firyanul.png" class="user-image img-circle elevation-2 alt="User Image">
+                <img src="{{ asset( Auth::user()->profile) }}" class="user-image img-circle elevation-2 alt="User Image">
                 @endif
                 <span class="hidden-xs">{{ Auth::user()->name }}</span>
             </a>
             <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                 <li class="user-header bg-primary">
                 @if (Auth::user()->employee)
-                <img  src="/storage/employee_photos/{{ Auth::user()->employee->photo }}"
-                class="img-circle elevation-2" alt="User Image">
-                @else
-                <img src="/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+                <img  src="{{ asset( Auth::user()->employee->photo) }}"
+                class="img-circle elevation-2" alt="{{ Auth::user()->employee->photo }}">
+                @else 
+                <img  src="{{ asset( Auth::user()->profile) }}"
+                class="img-circle elevation-2" alt="{{ Auth::user()->profile }}">
                 @endif
         
                 <p>
@@ -50,9 +51,11 @@
                 <li class="user-footer">
                 <div class="pull-left">
                     @if ( Auth::user()->employee )
+                    <a href="{{ route('employee.reset-password') }}" class="btn btn-default btn-flat">Change Password</a>
                     <a href="{{ route('employee.profile') }}" class="btn btn-default btn-flat">Profile</a>
                     @else
                     <a href="{{ route('admin.reset-password') }}" class="btn btn-default btn-flat">Change Password</a>
+                    <a type="button" data-toggle="modal" data-target="#changeprofile" class="btn btn-default btn-flat" >Change Profile</a>
                     @endif
                 </div>
                 <div class="pull-right">
@@ -75,3 +78,29 @@
         </li>
     </ul>
 </nav>
+<div class="modal fade" id="changeprofile" tabindex="-1" role="dialog" aria-labelledby="changeprofileLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="changeprofileLabel">Modal title</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form method="POST" enctype="multipart/form-data" action="{{ route('admin.change.profile') }}">
+                @csrf
+                @method('put')
+                <div class="form-group">
+                    <label for="">Profile</label>
+                    <input type="file" class="form-control" name="profile" required>
+                </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary" >Save</button>
+        </div>
+        </form>
+        </div>
+    </div>
+</div>

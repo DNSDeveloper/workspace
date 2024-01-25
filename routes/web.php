@@ -32,13 +32,15 @@ Route::namespace('Admin')->prefix('admin')->name('admin.')->middleware(['auth','
     Route::get('/', 'AdminController@index')->name('index');
     Route::get('/reset-password', 'AdminController@reset_password')->name('reset-password');
     Route::put('/update-password', 'AdminController@update_password')->name('update-password');
+    Route::put('/change-profile', 'AdminController@change_profile')->name('change.profile');
 
     // Routes for employees //
     Route::get('/employees/list-employees', 'EmployeeController@index')->name('employees.index');
     Route::get('/employees/add-employee', 'EmployeeController@create')->name('employees.create');
     Route::post('/employees', 'EmployeeController@store')->name('employees.store');
     Route::get('/employees/attendance', 'EmployeeController@attendance')->name('employees.attendance');
-    // Route::post('/employees/attendance', 'EmployeeController@attendance')->name('employees.attendance');
+    Route::post('/employees/attendance', 'EmployeeController@attendance')->name('employees.attendance');
+    Route::post('/employees/attendance/{id}', 'EmployeeController@update_attendance')->name('employees.attendance.terlambat');
     Route::delete('/employees/attendance/{attendance_id}', 'EmployeeController@attendanceDelete')->name('employees.attendance.delete');
     Route::get('/employees/profile/{employee_id}', 'EmployeeController@employeeProfile')->name('employees.profile');
     Route::delete('/employees/{employee_id}', 'EmployeeController@destroy')->name('employees.delete');
@@ -56,9 +58,11 @@ Route::namespace('Admin')->prefix('admin')->name('admin.')->middleware(['auth','
     // Routes for expenses //
     Route::get('/task', 'TaskController@index')->name('task.index');
     Route::get('/task/create', 'TaskController@create')->name('task.create');
+    Route::get('/task/history', 'TaskController@history')->name('task.history');
     Route::get('/task/detail/{id}', 'TaskController@detail')->name('task.detail');
     Route::post('/task/store', 'TaskController@store')->name('task.store');
     Route::post('/task/cancel/{id}', 'TaskController@cancel_task')->name('task.cancel');
+    Route::post('/task/approved/{id}', 'TaskController@approved_task')->name('task.approved');
     // Routes for expenses //
 
     // Routes for holidays //
@@ -68,6 +72,14 @@ Route::namespace('Admin')->prefix('admin')->name('admin.')->middleware(['auth','
     Route::get('/holidays/edit-holiday/{holiday_id}', 'HolidayController@edit')->name('holidays.edit');
     Route::put('/holidays/{holiday_id}', 'HolidayController@update')->name('holidays.update');
     Route::delete('/holidays/{holiday_id}', 'HolidayController@destroy')->name('holidays.delete');
+
+    Route::get('/services','ServiceController@index')->name('services.index');
+    Route::post('/services/store','ServiceController@store')->name('services.store');
+    Route::post('/services/update/{id}','ServiceController@update')->name('services.update');
+
+    Route::get('/positions','PositionController@index')->name('positions.index');
+    Route::post('/positions/store','PositionController@store')->name('positions.store');
+    Route::post('/positions/update/{id}','PositionController@update')->name('positions.update');
     // Routes for holidays //
 });
 
@@ -76,9 +88,12 @@ Route::namespace('Employee')->prefix('employee')->name('employee.')->middleware(
     Route::get('/profile', 'EmployeeController@profile')->name('profile');
     Route::get('/profile-edit/{employee_id}', 'EmployeeController@profile_edit')->name('profile-edit');
     Route::put('/profile/{employee_id}', 'EmployeeController@profile_update')->name('profile-update');
+
+    Route::get('/reset-password', 'EmployeeController@reset_password')->name('reset-password');
+    Route::put('/update-password', 'EmployeeController@update_password')->name('update-password');
     // Routes for Attendances //
     Route::get('/attendance/list-attendances', 'AttendanceController@index')->name('attendance.index');
-    // Route::post('/attendance/list-attendances', 'AttendanceController@index')->name('attendance.index');
+    Route::post('/attendance/list-attendances', 'AttendanceController@index')->name('attendance.index');
     Route::post('/attendance/get-location', 'AttendanceController@location')->name('attendance.get-location');
     Route::get('/attendance/register', 'AttendanceController@create')->name('attendance.create');
     Route::post('/attendance/{employee_id}', 'AttendanceController@store')->name('attendance.store');

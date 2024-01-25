@@ -29,6 +29,7 @@
         {{-- cancel ada remarks --}}
         <!-- Modal -->
         <a href="{{ route('admin.task.create') }}" class="btn btn-primary mb-3"><i class="fa fa-plus"></i> Add Task</a>
+        <br>
         @foreach ($units as $unit)
         <div class="row">
             <div class="col-lg">
@@ -58,8 +59,9 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($unit->tasks as $task)
-                                <tr>
+                                @foreach ($unit->tasks->whereIn('status',['on progress','open','cancel']) as $task)
+                                <tr style="background-color:  {{ ($task->status == 'open' || $task->status == 'on progress') 
+                                    && $task->deadline < today() ? 'antiquewhite' : 'white'}} ">
                                     <th>{{ $loop->iteration }}</th>
                                     <td>{{ $task->user->name}}</td>
                                     <td>{{ $task->employee->first_name}}</td>

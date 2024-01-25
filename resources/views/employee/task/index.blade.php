@@ -175,14 +175,14 @@
                         </div>
                     </div>
 
-                    @if(auth()->user()->employee->desg == 'Leader')
+                    @if(auth()->user()->employee->position->name == 'Leader')
                     <div class="float-right m-3">
                         <div class="gap-3">
                             <button class="btn btn-primary float-right" {{ $tasks->count() > 0 ? '' : 'disabled' }} data-toggle="modal" data-target="#addtask">
                                 Add Subtask <i class="fas fa-plus"></i>
                             </button>
                             <button class="btn btn-primary float-right mr-3" data-toggle="modal" data-target="#owntask">
-                                Add Own Task<i class="fas fa-plus"></i>
+                                Add Own Task <i class="fas fa-plus"></i>
                             </button>
                         </div>
                     </div>

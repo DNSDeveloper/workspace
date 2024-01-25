@@ -1,5 +1,29 @@
 <li class="nav-item has-treeview">
     <a href="#" class="nav-link">
+        <i class="nav-icon fa fa-unlock-alt"></i>
+        <p>
+            Data Master
+            <i class="fas fa-angle-left right"></i>
+            <span class="badge badge-info right">2</span>
+        </p>
+    </a>
+    <ul class="nav nav-treeview">
+        <li class="nav-item">
+            <a href="{{ route('admin.services.index') }}" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Service</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ route('admin.positions.index') }}" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Position</p>
+            </a>
+        </li>
+    </ul>
+</li>
+<li class="nav-item has-treeview">
+    <a href="#" class="nav-link">
         <i class="nav-icon fa fa-calendar-check-o"></i>
         <p>
             Employees
@@ -74,9 +98,14 @@
                 <i class="far fa-circle nav-icon"></i>
                 <p>Add Task</p>
             </a>
+            <a href="{{ route('admin.task.history') }}" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>History Task</p>
+            </a>
         </li>
     </ul>
 </li>
+
 <!-- <li class="nav-item has-treeview">
     <a href="#" class="nav-link">
         <i class="nav-icon fa fa-calendar-minus-o"></i>

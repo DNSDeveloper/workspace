@@ -39,16 +39,33 @@ class Register2Controller extends Controller
             'sex' => 'required',
             'desg' => 'required',
             'department_id' => 'required',
-            'salary' => 'required|numeric',
+            // 'salary' => 'required|numeric',
             'email' => 'required|email',
             'photo' => 'image|nullable',
             'password' => 'required|confirmed|min:6'
         ]);
-        $user = User::create([
-            'name' => $request->first_name.' '.$request->last_name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password)
-        ]);
+        $user = new User();
+        $user->name = $request->first_name.' '.$request->last_name;
+        $user->email = $request->email;
+        $user->password = Hash::make($request->password);
+
+        $getLastUsername = User::orderBy('created_at','DESC')->pluck('username')->first();
+        $lastXYZ = substr($getLastUsername,0,2);
+        $trimUsername = strtoupper(substr($request->first_name,0,3));
+        
+        switch ($lastXYZ) {
+            case 'XY':
+                $user->username = 'YZ'. $trimUsername;
+                break;
+            case 'YZ':
+                $user->username = 'ZX'. $trimUsername;
+                break;
+            case 'ZX':
+                $user->username = 'XY'. $trimUsername;
+                break;
+        }
+        $user->save();
+        
         $employeeRole = Role::where('name', 'employee')->first();
         $user->roles()->attach($employeeRole);
         $employeeDetails = [
@@ -58,9 +75,9 @@ class Register2Controller extends Controller
             'sex' => $request->sex, 
             'dob' => $request->dob, 
             'join_date' => $request->join_date,
-            'desg' => $request->desg, 
+            'position_id' => $request->position_id, 
             'department_id' => $request->department_id, 
-            'salary' => $request->salary, 
+            // 'salary' => $request->salary, 
             'photo'  => 'user.png'
         ];
         // Photo upload
@@ -84,7 +101,7 @@ class Register2Controller extends Controller
         }
         
         Employee::create($employeeDetails);
-        
+        dd($request->all());
         $request->session()->flash('success', 'Karyawan berhasil ditambahkan!');
         return back();
     }

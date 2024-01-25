@@ -16,9 +16,8 @@ return new class extends Migration
         Schema::create('daily_reports', function (Blueprint $table) {
             $table->id();
             $table->foreignId('employee_id')->constrained();
-            $table->foreignId('task_id')->constrained();
+            $table->text('task');
             $table->longText('report');
-            $table->text('ask')->nullable();
             $table->timestamps();
         });
     }

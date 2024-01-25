@@ -20,10 +20,10 @@ class CreateEmployeesTable extends Migration
             $table->string('last_name');
             $table->dateTime('dob');
             $table->string('sex');
-            $table->string('desg');
+            $table->string('position_id');
             $table->string('department_id');
             $table->dateTime('join_date');
-            $table->float('salary');
+            $table->float('salary')->nullable();
             $table->timestamps();
         });
     }

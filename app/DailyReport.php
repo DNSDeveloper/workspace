@@ -11,12 +11,14 @@ class DailyReport extends Model
 
     protected $fillable = [
         'report',
-        'ask',
         'employee_id',
-        'task_id'
+        'task'
     ];
 
     public function employee(){
         return $this->belongsTo('App\Employee');
+    }
+    public function task(){
+        return $this->belongsTo('App\Task');
     }
 }

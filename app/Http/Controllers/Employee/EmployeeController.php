@@ -8,11 +8,13 @@ use App\Employee;
 use App\Http\Controllers\Controller;
 use App\Subtask;
 use App\Task;
+use App\User;
 use Carbon\Carbon;
 use Intervention\Image\ImageManagerStatic as Image;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Hash;
 
 class EmployeeController extends Controller
 {
@@ -65,35 +67,38 @@ class EmployeeController extends Controller
         $employee->dob = $request->dob;
         $employee->sex = $request->gender;
         $employee->join_date = $request->join_date;
-        $employee->desg = $request->desg;
+        $employee->position_id = $request->position_id;
         $employee->department_id = $request->department_id;
         if ($request->hasFile('photo')) {
-            // Deleting the old image
-            if ($employee->photo != 'user.png') {
-                $old_filepath = public_path(DIRECTORY_SEPARATOR.'storage'.DIRECTORY_SEPARATOR.'employee_photos'.DIRECTORY_SEPARATOR. $employee->photo);
-                if(file_exists($old_filepath)) {
-                    unlink($old_filepath);
-                }    
-            }
-            // GET FILENAME
             $filename_ext = $request->file('photo')->getClientOriginalName();
-            // GET FILENAME WITHOUT EXTENSION
             $filename = pathinfo($filename_ext, PATHINFO_FILENAME);
-            // GET EXTENSION
             $ext = $request->file('photo')->getClientOriginalExtension();
-            //FILNAME TO STORE
-            $filename_store = $filename.'_'.time().'.'.$ext;
-            // UPLOAD IMAGE
-            // $path = $request->file('photo')->storeAs('public'.DIRECTORY_SEPARATOR.'employee_photos', $filename_store);
-            // add new file name
+            $filename_store =  strtolower($request->first_name) .'.'.$ext;
             $image = $request->file('photo');
             $image_resize = Image::make($image->getRealPath());              
             $image_resize->resize(300, 300);
-            $image_resize->save(public_path(DIRECTORY_SEPARATOR.'storage'.DIRECTORY_SEPARATOR.$filename_store));
+            $image_resize->save($filename_store);
             $employee->photo = $filename_store;
         }
         $employee->save();
         $request->session()->flash('success', 'Profil Anda Berhasil diupdate !');
         return redirect()->route('employee.profile');
+    }
+    public function reset_password() {
+        return view('auth.reset-password-employee');
+    }
+
+    public function update_password(Request $request) {
+        $user = Auth::user();
+        if(!Hash::check($request->old_password, auth()->user()->password)){
+            $request->session()->flash('error','Password Lama Salah');
+            return redirect()->back();
+        } else{
+            User::where('id',auth()->user()->id)->update([
+                'password' => Hash::make($request->password)
+            ]);
+            $request->session()->flash('success','Password Berhasil Dirubah');
+            return redirect()->back();
+        }
     }
 }

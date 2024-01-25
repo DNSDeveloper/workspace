@@ -24,13 +24,13 @@
             <div class="image">
                 @if (Auth::user()->employee)
                 <img
-                    src="/storage/{{ Auth::user()->employee->photo }}"
+                    src="{{ asset( Auth::user()->employee->photo) }}"
                     class="img-circle elevation-2"
                     alt="User Image"
                 />
                 @else
                 <img
-                    src="/dist/img/firyanul.png"
+                    src="{{ asset( Auth::user()->profile) }}"
                     class="img-circle elevation-2"
                     alt="User Image"
                 />

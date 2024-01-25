@@ -6,6 +6,7 @@ use App\Attendance;
 use App\Department;
 use App\Employee;
 use App\Http\Controllers\Controller;
+use App\Position;
 use App\Role;
 use App\User;
 use Carbon\Carbon;
@@ -27,9 +28,18 @@ class EmployeeController extends Controller
     public function create() {
         $data = [
             'departments' => Department::all(),
-            'desgs' => ['Manajer', 'Asisten Manajer', 'Kepala Divisi','Staff','Karyawan']
+            'positions' => Position::get()
         ];
         return view('admin.employees.create')->with($data);
+    }
+
+    public function update_attendance(Request $request,$id) {
+        $attend = Attendance::where('id',$id)->first();
+        $attend->update([
+            'keterangan'=> $request->keterangan
+        ]);
+        return redirect()->back()->with('success','Berhasil Merubah Absen');
+
     }
 
     public function store(Request $request) {
@@ -37,18 +47,36 @@ class EmployeeController extends Controller
             'first_name' => 'required',
             'last_name' => 'required',
             'sex' => 'required',
-            'desg' => 'required',
+            'position_id' => 'required',
             'department_id' => 'required',
             'salary' => 'required|numeric',
             'email' => 'required|email',
             'photo' => 'image|nullable',
             'password' => 'required|confirmed|min:6'
         ]);
-        $user = User::create([
-            'name' => $request->first_name.' '.$request->last_name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password)
-        ]);
+        
+        $user = new User();
+        $user->name = $request->first_name.' '.$request->last_name;
+        $user->email = $request->email;
+        $user->password = Hash::make($request->password);
+
+        $getLastUsername = User::orderBy('created_at','DESC')->pluck('username')->first();
+        $lastXYZ = substr($getLastUsername,0,2);
+        $trimUsername = strtoupper(substr($request->first_name,0,3));
+        
+        switch ($lastXYZ) {
+            case 'XY':
+                $user->username = 'YZ'. $trimUsername;
+                break;
+            case 'YZ':
+                $user->username = 'ZX'. $trimUsername;
+                break;
+            case 'ZX':
+                $user->username = 'XY'. $trimUsername;
+                break;
+        }
+        $user->save();
+                
         $employeeRole = Role::where('name', 'employee')->first();
         $user->roles()->attach($employeeRole);
         $employeeDetails = [
@@ -58,7 +86,7 @@ class EmployeeController extends Controller
             'sex' => $request->sex, 
             'dob' => $request->dob, 
             'join_date' => $request->join_date,
-            'desg' => $request->desg, 
+            'position_id' => $request->position_id, 
             'department_id' => $request->department_id, 
             'salary' => $request->salary, 
             'photo'  => 'user.png'
@@ -106,7 +134,7 @@ class EmployeeController extends Controller
     }
 
     public function attendanceByDate($date) {
-        $employees = DB::table('employees')->select('id', 'first_name', 'last_name', 'desg', 'department_id')->get();
+        $employees = DB::table('employees')->select('id', 'first_name', 'last_name', 'position_id', 'department_id')->get();
         $attendances = Attendance::all()->filter(function($attendance, $key) use ($date){
             return $attendance->created_at->dayOfYear == $date->dayOfYear;
         });

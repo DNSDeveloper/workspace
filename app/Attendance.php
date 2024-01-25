@@ -19,7 +19,8 @@ class Attendance extends Model
         'jam_masuk',
         'jam_pulang',
         'status',
-        'created_at'
+        'created_at',
+        'keterangan'
     ];
     public function employee() {
         return $this->belongsTo('App\Employee');

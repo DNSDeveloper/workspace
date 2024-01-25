@@ -60,7 +60,7 @@
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $employee->first_name.' '.$employee->last_name }}</td>
                                     <td>{{ $employee->department->name }}</td>
-                                    <td>{{ $employee->desg }}</td>
+                                    <td>{{ $employee->position->name }}</td>
                                     <td>{{ $employee->join_date->format('d M, Y') }}</td>
                                     <td>{{ $employee->salary }}</td>
                                     <td>

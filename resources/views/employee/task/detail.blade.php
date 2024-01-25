@@ -24,7 +24,53 @@
 </div>
 <section class="content">
     <div class="container-fluid">
+        <div class="modal fade" id="updatetask{{ $task->id }}" tabindex="-1"
+            role="dialog" aria-labelledby="updatetaskLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="updatetaskLabel">Update Status</h5>
+                        <button type="button" class="close" data-dismiss="modal"
+                            aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form action="{{ route('employee.task.update',$task->id ) }}"
+                        method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="modal-body">
+                            <div class="form-group mb-3">
+                                <label for="">Status</label>
+                                <select class="form-control" name="status" id="status" onchange="toggleReportTask(this)">
+                                    <option value="" hidden disabled selected value>--
+                                        Choose Status --</option>
+                                    <option value="on progress" {{ $task->status == 'on progress' ? 'hidden' : '' }}>On Progress</option>
+                                    <option value="done">Done</option>
+                                </select>
+                            </div>
+                            <div id="report-{{ $task->id }}">
+                                <div class="form-group mb-3">
+                                    <label for="">Attachment</label>
+                                    <input type="file" name="file" class="form-control" id="">
+                                </div>
+                                    
+                                <div class="form-group mb-3">
+                                    <label for="">Report</label>
+                                    <textarea name="report" class="form-control" id="" cols="30" rows="3"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary"
+                                data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
         <div class="card">
+            @include('messages.alerts')
             <div class="card-body">
                 <nav>
                     <div class="nav nav-tabs d-flex justify-content-around" id="nav-tab" role="tablist">
@@ -110,21 +156,22 @@
                                         </b>
                                     </td>
                                     <td>@if(($task->completed_time != null) &&
-                                        date('Y-m-d H:i:s',strtotime($task->completed_time)) < date('Y-m-d H:i:s',strtotime($task->deadline)))
+                                       ( date('Y-m-d H:i:s',strtotime($task->completed_time)) < 
+                                       date('Y-m-d H:i:s',strtotime($task->deadline))))
                                             <div class="badge badge-success">
                                                 110%
                                             </div>
                                             @elseif(($task->completed_time != null) &&
-                                            date('Y-m-d H:i:s',strtotime($task->completed_time) ==
+                                            (date('Y-m-d H:i:s',strtotime($task->completed_time)) ==
                                             date('Y-m-d H:i:s', strtotime($task->deadline))))
                                             <div class="badge badge-primary">
                                                 100%
                                             </div>
                                             @elseif(($task->completed_time != null) &&
-                                            date('Y-m-d H:i:s',strtotime($task->completed_time) >
+                                            (date('Y-m-d H:i:s',strtotime($task->completed_time) )>
                                             date('Y-m-d H:i:s',strtotime($task->deadline)) ))
                                             <div class="badge badge-warning">
-                                                90%
+                                                80%
                                             </div>
                                             @else
                                             <div class="badge badge-danger">
@@ -161,6 +208,9 @@
                                 </tr>
                             </tbody>
                         </table>
+                        @if($task->status != 'done')                            
+                        <button class="btn btn-success float-right" data-toggle="modal" data-target="#updatetask{{ $task->id }}"> <i class="fas fa-edit"></i> Update</button>
+                        @endif
                     </div>
                     <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
                         <h4 class="mt-3">Subtask</h4>
@@ -251,7 +301,25 @@
 
 @endsection
 @section('extra-js')
+<script>
+    function toggleReportTask(selectElement) {
+        var task = selectElement.closest('.modal').id.replace('updatetask', '');
 
+        // Dapatkan elemen select
+        var statusSelect = selectElement;
+        // Dapatkan elemen report-subtask
+        var reportTask = document.getElementById('report-' + task);
+
+        // Periksa nilai yang dipilih pada elemen select
+        if (statusSelect.value === 'done') {
+            // Jika nilai 'done', tampilkan report-subtask
+            reportTask.style.display = 'block';
+        } else {
+            // Jika nilai 'on progress' atau nilai lainnya, sembunyikan report-subtask
+            reportTask.style.display = 'none';
+        }
+    }
+</script>
 <script>
     $(document).ready(function() {
         $('#dataTable').DataTable({

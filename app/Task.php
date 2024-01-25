@@ -18,6 +18,7 @@ class Task extends Model
         'status',
         'category',
         'is_priority',
+        'is_approved',
         'unit_id',
         'service_id',
         'completed_time',

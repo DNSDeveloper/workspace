@@ -303,20 +303,16 @@
                                             <div class="modal-body">
                                                 <div class="mb-3">
                                                     <label for="">Task</label>
-                                                    <select name="task_id" id="" class="form-control">
-                                                        <option value="" hidden selected disabled>-- Choose Task  ---</option>
+                                                    <br>
+                                                    <select name="task[]" class="select2" id="select2" multiple="multiple" data-placeholder="Select a Task" style="width: 100%;">
                                                         @foreach ($tasks as $task)
-                                                            <option value="{{ $task->id }}">{{ $task->taskdail }}</option>
+                                                            <option value="{{ $task->task }}">{{ $task->task }}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
                                                 <div class="mb-3">
                                                     <label for="">Report</label>
-                                                    <textarea name="report" id="report"></textarea>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label for="">Ask (Optional)</label>
-                                                    <textarea name="ask" id="" class="form-control" cols="30" rows="3"></textarea>
+                                                    <textarea name="report" id="summernote"></textarea>
                                                 </div>
                                             </div>
                                             <input type="text" hidden name="employee_id" value="{{ $employee->id }}">
@@ -326,10 +322,12 @@
                                             </div>
                                             </div>
                                         </div>
-                                    </div> 
+                                    </div>
+                                    @if(date('H:i') >= '11:30')
                                     <button type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#exampleModal">
                                         Absen Pulang
                                     </button>
+                                    @endif
                                     @endif
                                 </div>   
                                 @endif
@@ -349,14 +347,28 @@
 @endsection
 
 @section('extra-js')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+  $('.select2').select2({
+    placeholder: "-- Select a Tasks --",
+  })
+</script>
 <script>
     setInterval(() => {
         $('.loading').hide()
         $('.absen').show()
     }, 3000);
 </script>
+<script>
+    $(function () {
+    // Summernote
+        $('#select2').select2()
+        $('#summernote').summernote()
+    })
+</script>
 <script src="https://cdn.ckeditor.com/ckeditor5/35.4.0/classic/ckeditor.js"></script>
-    <script type="text/javascript">
+    {{-- <script type="text/javascript">
     ClassicEditor
     .create( document.querySelector( '#report' ) )
     .then( newEditor => {
@@ -369,7 +381,7 @@
     document.querySelector( '#submit' ).addEventListener( 'click', () => {
         const editorData = editor.getData();
     } );
-    </script>
+    </script> --}}
         <script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.25/webcam.min.js"></script>
 
         <script language="JavaScript">

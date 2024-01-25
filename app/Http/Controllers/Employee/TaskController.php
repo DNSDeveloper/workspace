@@ -16,7 +16,8 @@ class TaskController extends Controller
     {
         $id = auth()->user()->employee->id;
         $tasks = Task::where('employee_id', $id)
-        ->whereNotIn('status',['done','cancel'])
+        ->where('is_approved',1)
+        ->whereNotIn('status',['done'])
         ->get();
         $subtasks = Subtask::where('employee_id',auth()->user()->employee->id)
         ->whereNotIn('status',['done','cancel'])
@@ -80,10 +81,11 @@ class TaskController extends Controller
             'is_priority' => $request->is_priority,
             'unit_id' => $request->unit,
             'service_id'=> $request->service,
-            'status'=> 'open'
+            'status'=> 'open',
+            'is_approved'=> '0',
         ]);
         if ($task) {
-            $request->session()->flash('success', "Task Berhasil ditambahkan");
+            $request->session()->flash('success', "Task Berhasil ditambahkan, tunggu atasan Approved");
         } else {
             $request->session()->flash('error', "Task Gagal Ditambahkan");
         }

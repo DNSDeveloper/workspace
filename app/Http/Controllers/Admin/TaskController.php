@@ -15,7 +15,8 @@ class TaskController extends Controller
 {
     public function index()
     {
-        $units = Unit::with('tasks')->get();
+        $units = Unit::with('tasks')
+        ->get();
         return view('admin.task.index', compact('units'));
     }
 
@@ -37,6 +38,12 @@ class TaskController extends Controller
     {
         $task = Task::with('subtasks')->where('id',$id)->first();
         return view('admin.task.detail',compact('task'));
+    }
+
+    public function history() {
+        $units = Unit::with('tasks')
+        ->get();
+        return view('admin.task.history', compact('units'));
     }
 
     public function store(Request $request)
@@ -73,5 +80,13 @@ class TaskController extends Controller
         $request->session()->flash('success', "Task Berhasil Di Cancel");
 
         return redirect()->back();
+    }
+
+    public function approved_task($id) {
+        $task = Task::where('id',$id)->first();
+        $task->update([
+            'is_approved'=> 1 
+        ]);
+        return redirect()->back()->with('success','Task Berhasil di Approved');
     }
 }

@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use phpDocumentor\Reflection\Location;
+use Intervention\Image\Facades\Image;
 class AttendanceController extends Controller
 {
     public function getIp(){
@@ -49,7 +50,11 @@ class AttendanceController extends Controller
     public function create() {
         $employee = Auth::user()->employee;
         $tasks = Task::where('employee_id',$employee->id)
-        ->whereIn('status',['on progress','open'])
+        ->whereIn('status',['on progress','done','open'])
+        ->where(function ($query) {
+            $query->whereNull('completed_time')
+                ->orWhere('completed_time', '>=', date('Y-m-d'));
+        })
         ->get();
         $data = [
             'employee' => $employee,
@@ -109,6 +114,12 @@ class AttendanceController extends Controller
         
         $file = $folderPath . $fileName;
         file_put_contents(public_path().'/img_present/'.$fileName,$image_base64);
+        Image::make($request->file('photo'))->resize(115, 115)->save('uploads/' . $nama_gambar);
+
+        // if ($photo) {
+        //     $nama_gambar = 'sangcahayaid-' . time() . $photo->getClientOriginalName();
+        //     $data['photo'] = 'uploads/' . $nama_gambar;
+        // }
 
         // Storage::disk('public')->put($file , $image_base64);
 
@@ -128,7 +139,8 @@ class AttendanceController extends Controller
         if (count($selectedSeats) >= 10) {
             $selectedSeats = [];
         }
-        $availableSeats = array_diff(range(1, 10), $selectedSeats);
+        $exceptionKursi = 8;
+        $availableSeats = array_diff(range(1, 10), [$exceptionKursi], $selectedSeats);
         // dd($availableSeats);
         if (!empty($availableSeats)) {
             $randomSeat = array_rand($availableSeats);
@@ -148,14 +160,13 @@ class AttendanceController extends Controller
     
 
     public function update(Request $request, $attendance_id) {
-        $reports = DailyReport::create([
-            'report'=> $request->report,
-            'ask'=> $request->ask,
-            'employee_id'=> $request->employee_id,
-            'task_id'=> $request->task_id
-        ]);
-        dd($reports);
+        $reports = new DailyReport();
+        $reports->report = $request->report;
+        $reports->employee_id = $request->employee_id;
         
+        $tasks = json_encode($request->task);
+        $reports->task = $tasks;
+        $reports->save();
         
         $attendance = Attendance::findOrFail($attendance_id);
         $attendance->exit_ip = $request->ip();

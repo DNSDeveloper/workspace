@@ -103,19 +103,19 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <label for="">Jabatan</label>
-                                        <select name="desg" class="form-control">
+                                        <select name="position_id" class="form-control">
                                             <option hidden disabled selected value> -- Pilih Opsi -- </option>
-                                            @foreach ($desgs as $desg)
-                                                <option value="{{ $desg }}"
-                                                @if (old('desg') == $desg)
+                                            @foreach ($positions as $position)
+                                                <option value="{{ $position->id }}"
+                                                @if (old('position') == $position)
                                                     selected
                                                 @endif
                                                 >
-                                                    {{ $desg }}
+                                                    {{ $position->name }}
                                                 </option>
                                             @endforeach
                                         </select>
-                                        @error('desg')
+                                        @error('position')
                                         <div class="text-danger">
                                             Silahkan Pilih Opsi Valid
                                         </div>

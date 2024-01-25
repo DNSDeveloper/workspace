@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Department;
 use App\Http\Controllers\Controller;
+use App\Position;
 use App\Providers\RouteServiceProvider;
 use App\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -67,7 +72,15 @@ class RegisterController extends Controller
         return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
+            'username'=> $data['username'],
             'password' => Hash::make($data['password']),
         ]);
+    }
+
+    public function showRegistrationForm()
+    {
+        $departements = Department::get();
+        $positions = Position::get();
+        return view('auth.register',compact('departements','positions'));
     }
 }

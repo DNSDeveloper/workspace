@@ -27,6 +27,7 @@ return new class extends Migration
             $table->timestamp('deadline')->nullable();
             $table->string('attach_done')->nullable();
             $table->string('report_done')->nullable();
+            $table->boolean('is_approved')->default('1')->nullable();
             $table->timestamp('completed_time')->nullable();
             $table->timestamps();
         });

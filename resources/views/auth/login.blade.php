@@ -90,6 +90,168 @@
     <title>Login | Web Absensi</title>
 
     <style>
+        @media only screen and (max-width: 600px) {
+            body {
+                margin: 0;
+                margin-top: 50px;
+                box-sizing: border-box;
+                font-family: "poppins";
+                background-image: url('bg-login-mobile.png');
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-position: center;
+                color: var(--color);
+                letter-spacing: 1px;
+                transition: background 0.2s ease;
+                -webkit-transition: background 0.2s ease;
+                -moz-transition: background 0.2s ease;
+                -ms-transition: background 0.2s ease;
+                -o-transition: background 0.2s ease;
+            }
+
+            .circle {
+                display: none;
+            }
+        }
+
+        @media only screen and (min-width: 600px) {
+            body {
+                margin: 0;
+                margin-top: 50px;
+                box-sizing: border-box;
+                font-family: "poppins";
+                background-image: url('bg-login-mobile.png');
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-position: center;
+                color: var(--color);
+                letter-spacing: 1px;
+                transition: background 0.2s ease;
+                -webkit-transition: background 0.2s ease;
+                -moz-transition: background 0.2s ease;
+                -ms-transition: background 0.2s ease;
+                -o-transition: background 0.2s ease;
+            }
+
+            .circle {
+                display: none;
+            }
+        }
+
+
+        /* Large devices (laptops/desktops, 992px and up) */
+        @media only screen and (min-width: 992px) {
+            body {
+                margin: 0;
+                box-sizing: border-box;
+                font-family: "poppins";
+                background-image: url('bg-login.png');
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-position: center;
+                color: var(--color);
+                letter-spacing: 1px;
+                transition: background 0.2s ease;
+                -webkit-transition: background 0.2s ease;
+                -moz-transition: background 0.2s ease;
+                -ms-transition: background 0.2s ease;
+                -o-transition: background 0.2s ease;
+            }
+
+            .circle {
+                display: block;
+                width: 8rem;
+                height: 8rem;
+                background: var(--primary-color);
+                border-radius: 50%;
+                -webkit-border-radius: 50%;
+                -moz-border-radius: 50%;
+                -ms-border-radius: 50%;
+                -o-border-radius: 50%;
+                position: absolute;
+            }
+
+            .circle-one {
+                display: block;
+                top: 0;
+                left: 0;
+                z-index: -1;
+                transform: translate(-45%, -45%);
+                -webkit-transform: translate(-45%, -45%);
+                -moz-transform: translate(-45%, -45%);
+                -ms-transform: translate(-45%, -45%);
+                -o-transform: translate(-45%, -45%);
+            }
+
+            .circle-two {
+                display: block;
+                bottom: 0;
+                right: 0;
+                z-index: -1;
+                transform: translate(45%, 45%);
+                -webkit-transform: translate(45%, 45%);
+                -moz-transform: translate(45%, 45%);
+                -ms-transform: translate(45%, 45%);
+                -o-transform: translate(45%, 45%);
+            }
+        }
+
+        /* Extra large devices (large laptops and desktops, 1200px and up) */
+        @media only screen and (min-width: 1200px) {
+            body {
+                margin: 0;
+                box-sizing: border-box;
+                font-family: "poppins";
+                background-image: url('bg-login.png');
+                background-size: cover;
+                background-repeat: no-repeat;
+                color: var(--color);
+                letter-spacing: 1px;
+                transition: background 0.2s ease;
+                -webkit-transition: background 0.2s ease;
+                -moz-transition: background 0.2s ease;
+                -ms-transition: background 0.2s ease;
+                -o-transition: background 0.2s ease;
+            }
+
+            .circle {
+                display: block;
+                width: 8rem;
+                height: 8rem;
+                background: var(--primary-color);
+                border-radius: 50%;
+                -webkit-border-radius: 50%;
+                -moz-border-radius: 50%;
+                -ms-border-radius: 50%;
+                -o-border-radius: 50%;
+                position: absolute;
+            }
+
+            .circle-one {
+                display: block;
+                top: 0;
+                left: 0;
+                z-index: -1;
+                transform: translate(-45%, -45%);
+                -webkit-transform: translate(-45%, -45%);
+                -moz-transform: translate(-45%, -45%);
+                -ms-transform: translate(-45%, -45%);
+                -o-transform: translate(-45%, -45%);
+            }
+
+            .circle-two {
+                display: block;
+                bottom: 0;
+                right: 0;
+                z-index: -1;
+                transform: translate(45%, 45%);
+                -webkit-transform: translate(45%, 45%);
+                -moz-transform: translate(45%, 45%);
+                -ms-transform: translate(45%, 45%);
+                -o-transform: translate(45%, 45%);
+            }
+        }
+
         :root {
             --background: #1a1a2e;
             --color: #ffffff;
@@ -104,18 +266,9 @@
             scroll-behavior: smooth;
         }
 
-        body {
-            margin: 0;
-            box-sizing: border-box;
-            font-family: "poppins";
-            background: var(--background);
-            color: var(--color);
-            letter-spacing: 1px;
-            transition: background 0.2s ease;
-            -webkit-transition: background 0.2s ease;
-            -moz-transition: background 0.2s ease;
-            -ms-transition: background 0.2s ease;
-            -o-transition: background 0.2s ease;
+        ::placeholder {
+            color: white;
+            opacity: 0.5;
         }
 
         a {
@@ -212,45 +365,11 @@
             -o-transform: scale(1.02);
         }
 
-        .circle {
-            width: 8rem;
-            height: 8rem;
-            background: var(--primary-color);
-            border-radius: 50%;
-            -webkit-border-radius: 50%;
-            -moz-border-radius: 50%;
-            -ms-border-radius: 50%;
-            -o-border-radius: 50%;
-            position: absolute;
-        }
-
         .illustration {
             position: absolute;
             top: -14%;
             right: -2px;
             width: 90%;
-        }
-
-        .circle-one {
-            top: 0;
-            left: 0;
-            z-index: -1;
-            transform: translate(-45%, -45%);
-            -webkit-transform: translate(-45%, -45%);
-            -moz-transform: translate(-45%, -45%);
-            -ms-transform: translate(-45%, -45%);
-            -o-transform: translate(-45%, -45%);
-        }
-
-        .circle-two {
-            bottom: 0;
-            right: 0;
-            z-index: -1;
-            transform: translate(45%, 45%);
-            -webkit-transform: translate(45%, 45%);
-            -moz-transform: translate(45%, 45%);
-            -ms-transform: translate(45%, 45%);
-            -o-transform: translate(45%, 45%);
         }
 
         .register-forget {
@@ -324,14 +443,10 @@
                 <h1 class="opacity">LOGIN</h1>
                 <form method="POST" action="{{ route('login') }}">
                     @csrf
-                    <input type="text" name="email" placeholder="Email" required />
+                    <input type="text" name="username" placeholder="Email" required />
                     <input type="password" name="password" placeholder="Password" required />
                     <button class="opacity" type="submit">SUBMIT</button>
                 </form>
-                {{-- <div class="register-forget opacity">
-                    <a href="">REGISTER</a>
-                    <a href="">FORGOT PASSWORD</a>
-                </div> --}}
             </div>
             <div class="circle circle-two"></div>
         </div>
