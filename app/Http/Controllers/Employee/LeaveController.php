@@ -48,8 +48,11 @@ class LeaveController extends Controller
         // else if($request->input('reason')=="Cuti" && (date('d', strtotime($cb)>=$cb4 || $str>=$cb4 || $cb>date('d') || $str>date('d')))) {
         //     echo'<script>alert("'.$str.'Izin Cuti hanya bisa diajukan maksimal H-1 sejak tanggal ketidakhadiran");window.location="'.$red.'";</script>';
         // } else {
-        $date = date('d',strtotime($cb));
-        if($date <= date('d') && $str <= date('d')) {
+        $day = date('d',strtotime($cb));
+        $month = date('m',strtotime($cb));
+        dd($request->all());
+        // (jika str <= hari ini dan bulan == bulan ini ) || () 
+        if($day <= date('d') && $str <= date('d')) {
             $request->session()->flash('error','Pengajuan Cuti hanya bisa dilakukan maksimal H-1 dari tanggal ketidakhadiran');
             return redirect()->back();
         }

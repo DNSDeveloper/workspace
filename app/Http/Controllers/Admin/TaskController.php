@@ -87,6 +87,6 @@ class TaskController extends Controller
         $task->update([
             'is_approved'=> 1 
         ]);
-        return redirect()->back()->with('success','Task Berhasil di Approved');
+        return redirect()->route('admin.task.index')->with('success','Task Berhasil di Approved');
     }
 }

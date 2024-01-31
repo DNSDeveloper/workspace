@@ -35,7 +35,6 @@ class LeaveController extends Controller
         
         $m = date('m',strtotime($leave->start_date));
         $y = date('Y',strtotime($leave->start_date)); 
-        
         if($leave->status == 'approved') {
             if($end == null) {
                 $attendance = Attendance::create([

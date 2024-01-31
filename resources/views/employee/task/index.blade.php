@@ -77,8 +77,9 @@
                                                 <label for="">Category</label>
                                                 <select name="category" id="" class="form-control">
                                                     <option value="" hidden disabled selected> -- Select Periodik --</option>
-                                                    <option value="periodik">Periodik</option>
                                                     <option value="reguler">Reguler</option>
+                                                    <option value="periodik perminggu">Periodik Perminggu</option>
+                                                    <option value="periodik perbulan">Periodik Perbulan</option>
                                                 </select>
                                             </div>
             

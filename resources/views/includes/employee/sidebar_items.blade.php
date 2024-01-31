@@ -1,10 +1,10 @@
 <li class="nav-item has-treeview">
     <a href="#" class="nav-link">
-        <i class="nav-icon fa fa-calendar-check-o"></i>
-        <p>
+        <i style="color: white; opacity: 1;" class="nav-icon fa fa-calendar-check-o"></i>
+        <p style="color: white;opacity:1">
             Absensi
-            <i class="fas fa-angle-left right"></i>
-            <span class="badge badge-info right">2</span>
+            <i style="color: white; opacity: 1;" class="fas fa-angle-left right"></i>
+            {{-- <span class="badge badge-info right">2</span> --}}
         </p>
     </a>
     <ul class="nav nav-treeview">
@@ -13,8 +13,8 @@
                 href="{{ route('employee.attendance.create') }}"
                 class="nav-link"
             >
-                <i class="far fa-circle nav-icon"></i>
-                <p>Absensi Hari ini</p>
+                <i style="color: white; opacity: 1;" class="far fa-circle nav-icon"></i>
+                <p style="color: white;opacity:1">Absensi Hari ini</p>
             </a>
         </li>
         <li class="nav-item">
@@ -22,19 +22,19 @@
                 href="{{ route('employee.attendance.index') }}"
                 class="nav-link"
             >
-                <i class="far fa-circle nav-icon"></i>
-                <p>Daftar Absensi</p>
+                <i style="color: white; opacity: 1;" class="far fa-circle nav-icon"></i>
+                <p style="color: white;opacity:1">Daftar Absensi</p>
             </a>
         </li>
     </ul>
 </li>
 <li class="nav-item has-treeview">
     <a href="#" class="nav-link">
-        <i class="nav-icon fa fa-calendar-minus-o"></i>
-        <p>
+        <i style="color: white; opacity: 1;" class="nav-icon fa fa-calendar-minus-o"></i>
+        <p style="color: white;opacity:1">
             Cuti
-            <i class="fas fa-angle-left right"></i>
-            <span class="badge badge-info right">2</span>
+            <i style="color: white; opacity: 1;" class="fas fa-angle-left right"></i>
+            {{-- <span class="badge badge-info right">2</span> --}}
         </p>
     </a>
     <ul class="nav nav-treeview">
@@ -43,8 +43,8 @@
             href="{{ route('employee.leaves.create') }}"
                 class="nav-link"
             >
-                <i class="far fa-circle nav-icon"></i>
-                <p>Ajukan Cuti</p>
+                <i style="color: white; opacity: 1;" class="far fa-circle nav-icon"></i>
+                <p style="color: white;opacity:1">Ajukan Cuti</p>
             </a>
         </li>
         <li class="nav-item">
@@ -52,18 +52,18 @@
             href="{{ route('employee.leaves.index') }}"
                 class="nav-link"
             >
-                <i class="far fa-circle nav-icon"></i>
-                <p>Daftar Cuti</p>
+                <i style="color: white; opacity: 1;" class="far fa-circle nav-icon"></i>
+                <p style="color: white;opacity:1">Daftar Cuti</p>
             </a>
         </li>
     </ul>
 </li>
 <li class="nav-item has-treeview">
     <a href="#" class="nav-link">
-        <i class="nav-icon fa fa-calendar-minus-o"></i>
-        <p>
+        <i style="color: white; opacity: 1;" class="nav-icon fa fa-calendar-minus-o"></i>
+        <p style="color: white;opacity:1">
             Task
-            <i class="fas fa-angle-left right"></i>
+            <i style="color: white; opacity: 1;" class="fas fa-angle-left right"></i>
             {{-- <span class="badge badge-info right">2</span> --}}
         </p>
     </a>
@@ -73,25 +73,25 @@
             href="{{ route('employee.task') }}"
                 class="nav-link"
             >
-                <i class="far fa-circle nav-icon"></i>
-                <p>Daftar Task</p>
+                <i style="color: white; opacity: 1;" class="far fa-circle nav-icon"></i>
+                <p style="color: white;opacity:1">Daftar Task</p>
             </a>
             <a
             href="{{ route('employee.task.history') }}"
                 class="nav-link"
             >
-                <i class="far fa-circle nav-icon"></i>
-                <p>History Task</p>
+                <i style="color: white; opacity: 1;" class="far fa-circle nav-icon"></i>
+                <p style="color: white;opacity:1">History Task</p>
             </a>
         </li>
     </ul>
 </li>
 <!-- <li class="nav-item has-treeview">
     <a href="#" class="nav-link">
-        <i class="nav-icon fa fa-calendar-minus-o"></i>
-        <p>
+        <i style="color: white; opacity: 1;" class="nav-icon fa fa-calendar-minus-o"></i>
+        <p style="color: white;opacity:1">
             Expenses
-            <i class="fas fa-angle-left right"></i>
+            <i style="color: white; opacity: 1;" class="fas fa-angle-left right"></i>
             <span class="badge badge-info right">2</span>
         </p>
     </a>
@@ -101,8 +101,8 @@
             href="{{ route('employee.expenses.create') }}"
                 class="nav-link"
             >
-                <i class="far fa-circle nav-icon"></i>
-                <p>Claim Expense</p>
+                <i style="color: white; opacity: 1;" class="far fa-circle nav-icon"></i>
+                <p style="color: white;opacity:1">Claim Expense</p>
             </a>
         </li>
         <li class="nav-item">
@@ -110,18 +110,18 @@
             href="{{ route('employee.expenses.index') }}"
                 class="nav-link"
             >
-                <i class="far fa-circle nav-icon"></i>
-                <p>List of Expenses</p>
+                <i style="color: white; opacity: 1;" class="far fa-circle nav-icon"></i>
+                <p style="color: white;opacity:1">List of Expenses</p>
             </a>
         </li>
     </ul>
 </li>
 <li class="nav-item has-treeview">
     <a href="#" class="nav-link">
-        <i class="nav-icon fa fa-address-card"></i>
-        <p>
+        <i style="color: white; opacity: 1;" class="nav-icon fa fa-address-card"></i>
+        <p style="color: white;opacity:1">
             Self
-            <i class="fas fa-angle-left right"></i>
+            <i style="color: white; opacity: 1;" class="fas fa-angle-left right"></i>
             <span class="badge badge-info right">3</span>
         </p>
     </a>
@@ -131,8 +131,8 @@
                 href="{{ route('employee.self.salary_slip') }}"
                 class="nav-link"
             >
-                <i class="far fa-circle nav-icon"></i>
-                <p>Generate Salary slip</p>
+                <i style="color: white; opacity: 1;" class="far fa-circle nav-icon"></i>
+                <p style="color: white;opacity:1">Generate Salary slip</p>
             </a>
         </li>
         <li class="nav-item">
@@ -140,8 +140,8 @@
                 href="{{ route('employee.self.holidays') }}"
                 class="nav-link"
             >
-                <i class="far fa-circle nav-icon"></i>
-                <p>Holiday List</p>
+                <i style="color: white; opacity: 1;" class="far fa-circle nav-icon"></i>
+                <p style="color: white;opacity:1">Holiday List</p>
             </a>
         </li>
     </ul>

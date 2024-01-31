@@ -7,6 +7,7 @@ use App\Attendance;
 use App\DailyReport;
 use App\Holiday;
 use App\Rules\DateRange;
+use App\Subtask;
 use App\Task;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -51,16 +52,29 @@ class AttendanceController extends Controller
         $employee = Auth::user()->employee;
         $tasks = Task::where('employee_id',$employee->id)
         ->whereIn('status',['on progress','done','open'])
+        ->where('is_approved',1)
         ->where(function ($query) {
             $query->whereNull('completed_time')
-                ->orWhere('completed_time', '>=', date('Y-m-d'));
+                ->orWhereDate('completed_time', '=', date('Y-m-d'));
+        })
+        ->get();
+
+        $subtasks = Subtask::where('employee_id',$employee->id)
+        ->whereIn('status',['on progress','done','open'])
+        ->where(function ($query) {
+            $query->whereNull('completed_time')
+                ->orWhereDate('completed_time', '=', date('Y-m-d'));
+        })
+        ->whereHas('task',function($q) {
+            $q->where('is_approved',1);
         })
         ->get();
         $data = [
             'employee' => $employee,
             'attendance' => null,
             'registered_attendance' => null,
-            'tasks'=> $tasks
+            'tasks'=> $tasks,
+            'subtasks'=> $subtasks
         ];
         // $last_attendance = $employee->attendance;
         $last_attendance = Attendance::where('employee_id',auth()->user()->employee->id)
@@ -114,7 +128,7 @@ class AttendanceController extends Controller
         
         $file = $folderPath . $fileName;
         file_put_contents(public_path().'/img_present/'.$fileName,$image_base64);
-        Image::make($request->file('photo'))->resize(115, 115)->save('uploads/' . $nama_gambar);
+        // Image::make($request->file('photo'))->resize(115, 115)->save('uploads/' . $nama_gambar);
 
         // if ($photo) {
         //     $nama_gambar = 'sangcahayaid-' . time() . $photo->getClientOriginalName();
@@ -132,21 +146,101 @@ class AttendanceController extends Controller
             'img_present'=> $file,
             'status'=>date('H:i') > '09:30' ? 'terlambat' : 'hadir'
         ]);
+        // $selectedSeats = Attendance::whereDate('created_at', Carbon::now())
+        //     ->pluck('no_kursi')
+        //     ->toArray(); 
+
+        // $kel1 = [1, 2, 3, 4, 5];
+        // $kel2 = [6, 7];
+        // $kel3 = [9, 10];
+
+        // // 1 3 2 
+        // // 2 3 1
+        // // 3 2 1
+        // if (empty($selectedSeats)) {
+        //     $availableSeats = array_diff(range(1, 10), $selectedSeats);
+        // } else {
+        //     switch ($selectedSeats[0]) {
+        //         case in_array(end($selectedSeats), [1, 2, 3, 4, 5]):
+        //             $availableSeats = array_diff($kel3, $selectedSeats);
+        //             break;
+        //         case in_array(end($selectedSeats), [6, 7]):
+        //             $availableSeats = array_diff($kel1, $selectedSeats);
+        //             break;
+        //         case in_array(end($selectedSeats), [9, 10]):
+        //             $availableSeats = array_diff($kel2, $selectedSeats);
+        //             break;
+        //         default:
+        //             $availableSeats = array_diff(range(1, 10), $selectedSeats);
+        //             break;
+        //     }
+        // }
+
+        // if (empty($availableSeats)) {
+        //     $availableSeats = array_diff(range(1, 10), $selectedSeats);
+        // }
+
+        // $randomSeat = array_rand($availableSeats);
+        // $attendance->no_kursi = $availableSeats[$randomSeat];
+
         $selectedSeats = Attendance::whereDate('created_at',Carbon::now())
         ->pluck('no_kursi')
-        ->toArray();
+        ->toArray(); 
 
-        if (count($selectedSeats) >= 10) {
-            $selectedSeats = [];
-        }
-        $exceptionKursi = 8;
-        $availableSeats = array_diff(range(1, 10), [$exceptionKursi], $selectedSeats);
-        // dd($availableSeats);
-        if (!empty($availableSeats)) {
+        $kel1 = [1,2,3,4,5];
+        $kel2 = [6,7];
+        $kel3 = [9,10];
+
+        // 1 3 2 
+        // 2 1 3
+        // 3 1 2
+        $except = 8;
+        if($selectedSeats == []) {
+            $availableSeats = array_diff(range(1,10), [$except], $selectedSeats);
             $randomSeat = array_rand($availableSeats);
             $attendance->no_kursi = $availableSeats[$randomSeat];
-            // return $availableSeats[$randomSeat];
+        } else {
+            if(in_array($selectedSeats[0],$kel1)) {
+                if(end($selectedSeats)>= 9) {
+                    $availableSeats = array_diff($kel2, $selectedSeats);
+                } else if((end($selectedSeats) == 6 ) || (end($selectedSeats) == 7) ) {
+                    $availableSeats = array_diff($kel1, $selectedSeats);
+                } else{
+                    $availableSeats = array_diff($kel3, $selectedSeats);
+                };
+            } else if(in_array($selectedSeats[0],$kel2)) {
+                if(end($selectedSeats)>= 9) {
+                    $availableSeats = array_diff($kel2, $selectedSeats);
+                } else if((end($selectedSeats) >= 1) && (end($selectedSeats) <= 5) ) {
+                    $availableSeats = array_diff($kel3, $selectedSeats);
+                } else{
+                    $availableSeats = array_diff($kel1, $selectedSeats);
+                };
+            }  else if(in_array($selectedSeats[0],$kel3)) {
+                if((end($selectedSeats) == 6) || (end($selectedSeats) == 7)) {
+                    $availableSeats = array_diff($kel3, $selectedSeats);
+                } else if((end($selectedSeats) >= 1) && (end($selectedSeats) <= 5) ) {
+                    $availableSeats = array_diff($kel2, $selectedSeats);
+                } else{
+                    $availableSeats = array_diff($kel1, $selectedSeats);
+                };
+            } 
+            if($availableSeats == []) {
+                $availableSeats = array_diff(range(1,10),[$except], $selectedSeats);
+                $randomSeat = array_rand($availableSeats);
+                $attendance->no_kursi = $availableSeats[$randomSeat];
+            }
+            $randomSeat = array_rand($availableSeats);
+            $attendance->no_kursi = $availableSeats[$randomSeat];
         }
+
+        // $exceptionKursi = 8;
+        // $availableSeats = array_diff(range(1, 10), [$exceptionKursi], $selectedSeats);
+        // // dd($availableSeats);
+        // if (!empty($availableSeats)) {
+        //     $randomSeat = array_rand($availableSeats);
+        //     $attendance->no_kursi = $availableSeats[$randomSeat];
+        // }
         $attendance->save();
         if(date('H:i')<='09:30') {
          $request->session()->flash('success', "Keren! Kamu Datang Tepat Waktu 🤩, Silahkan duduk di kursi $availableSeats[$randomSeat]");

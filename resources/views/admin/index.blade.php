@@ -3,36 +3,34 @@
 @section('content')
 <section class="content">
     <div class="container-fluid pt-5">
-        {{-- <div class="card">
-            <div class="card-body">
-                @php
-                $default = 100;
-                @endphp
-
-                @if(date('l') == 'Monday')
-                <div class="progress">
-                    <div class="progress-bar" role="progressbar" style="width: 15%" aria-valuenow="15" aria-valuemin="0"
-                        aria-valuemax="100"></div>
-                    <div class="progress-bar bg-success" role="progressbar" style="width: 30%" aria-valuenow="30"
-                        aria-valuemin="0" aria-valuemax="100"></div>
-                    <div class="progress-bar bg-info" role="progressbar" style="width: 20%" aria-valuenow="20"
-                        aria-valuemin="0" aria-valuemax="100"></div>
-                </div>
-                @else
-                    @foreach($todayAttendances as $attend)
-                    <label for="">{{ $attend->employee->first_name }}</label>
-                    <div class="progress">
-                        <div class="progress-bar" role="progressbar" style="width: {{ $default }}%;"
-                            aria-valuenow="{{ $default }}" aria-valuemin="0" aria-valuemax="100">{{ $attend->jam_masuk }}
-                        </div>
-                    </div>
-                    @php
-                    $default -=10;
-                    @endphp
-                    @endforeach
-                @endif
+        <div class="card">
+            <div class="card-header">
+                <h4>Ranking Absensi</h4>
             </div>
-        </div> --}}
+            <div class="card-body">
+                @foreach($ranksAttendances as $attend)
+                <label for="">{{ $attend->employee->first_name }}</label>
+                @php
+                $totalPercentage = 100;
+                $total = $attend->terlambat + $attend->hadir + $attend->cuti;
+                $latePercentage = ($attend->terlambat / $total) * $totalPercentage;
+                $presentPercentage = ($attend->hadir / $total) * $totalPercentage;
+                $leavePercentage = ($attend->cuti / $total) * $totalPercentage;
+                @endphp
+                <div class="progress">
+                    <div class="progress-bar bg-warning" title="Terlambat" role="progressbar"
+                        style="width: {{ $latePercentage }}%" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100">
+                        {{ $attend->terlambat }}</div>
+                    <div class="progress-bar bg-success" title="Hadir" role="progressbar"
+                        style="width: {{ $presentPercentage }}%" aria-valuenow="30" aria-valuemin="0"
+                        aria-valuemax="100">{{ $attend->hadir }}</div>
+                    <div class="progress-bar bg-info" title="Cuti" role="progressbar"
+                        style="width: {{ $leavePercentage }}%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">
+                        {{ $attend->cuti }}</div>
+                </div>
+                @endforeach
+            </div>
+        </div>
         <div class="card">
             <div class="card-body">
                 <h4>
@@ -91,6 +89,7 @@
             <div class="card-body">
                 <h4>Presensi Hari Ini</h4>
                 <div class="row">
+                    @if ($todayAttendances->count() > 0)
                     @foreach ($todayAttendances as $todayAttendance)
                     <div class="col-lg-4 col-md-6 col-sm-12">
                         <div class="card">
@@ -143,7 +142,14 @@
                         </div>
                     </div>
                     @endforeach
+                    @else
                 </div>
+                <div class="d-flex justify-content-center text-center">
+                    <p class="text-center">
+                        Not Yet Absensi
+                    </p>
+                </div>
+                @endif
             </div>
         </div>
 
@@ -171,7 +177,13 @@
                                         <td>{{ $report->employee->first_name . ' ' . $report->employee->last_name}}</td>
                                         {{-- <td>{{ $report->task->task }}</td> --}}
                                         <td>
-                                            {{ $report->task }}
+                                            @foreach (json_decode($report->task) as $taskreport)
+                                            <ul>
+                                                <li>
+                                                    {{ $taskreport }}
+                                                </li>
+                                            </ul>
+                                            @endforeach
                                         </td>
                                         <td>{!! $report->report !!}</td>
                                     </tr>
@@ -195,3 +207,38 @@
 <!-- /.content-wrapper -->
 
 @endsection
+{{-- @section('extra-js')
+<script>
+    const ctx = document.getElementById('myChart');
+    var cData = JSON.parse(`<?php echo $chart_struktur; ?>`);
+    var cLabels = <?php echo json_encode($result->pluck('employee_name')); ?>; // Ambil nama karyawan dari koleksi
+    var cAttendances = <?php echo json_encode($result->pluck('attendances')); ?>;
+console.log(cAttendances)
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: cLabels,
+        datasets: cAttendances.map((attendances, index) => {
+            return {
+                label: cLabels[index],
+                data: attendances.map(attendance => {
+                }),
+                borderWidth: 1
+            };
+        })
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'Chart.js Bar Chart'
+            }
+        }
+    }
+});
+</script>
+@endsection --}}

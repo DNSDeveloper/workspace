@@ -308,6 +308,9 @@
                                                         @foreach ($tasks as $task)
                                                             <option value="{{ $task->task }}">{{ $task->task }}</option>
                                                         @endforeach
+                                                        @foreach ($subtasks as $subtask)
+                                                            <option value="{{ $subtask->task->task }}">{{ $subtask->task->task }}</option>
+                                                        @endforeach
                                                     </select>
                                                 </div>
                                                 <div class="mb-3">
