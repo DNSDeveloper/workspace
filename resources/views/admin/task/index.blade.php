@@ -28,7 +28,23 @@
         {{-- note --}}
         {{-- cancel ada remarks --}}
         <!-- Modal -->
-        <a href="{{ route('admin.task.create') }}" class="btn btn-primary mb-3"><i class="fa fa-plus"></i> Add Task</a>
+
+        <div class="form-group d-flex gap-3">
+            <div class="mr-3">
+                <a href="{{ route('admin.task.create') }}" class="btn btn-primary"><i class="fa fa-plus"></i> Add
+                    Task</a>
+            </div>
+            {{-- <div class="">
+                <select name="bg bg-primary" class="form-control" id="employees">
+                    <option value="" hidden selected>-- Filter By Employee --</option>
+                    <option value="all">All Employee</option>
+                    @foreach ($employees as $employee)
+                    <option value="{{ $employee->first_name }}">{{ $employee->first_name . ' ' . $employee->last_name }}
+                    </option>
+                    @endforeach
+                </select>
+            </div> --}}
+        </div>
         <br>
         @foreach ($units as $unit)
         <div class="row">
@@ -40,12 +56,8 @@
                             {{ $unit->name }}
                         </div>
                     </div>
-                    {{-- <div class="float-right">
-                        <a href="{{ route('admin.task.detail', str_replace(' ','-',$unit->name)) }}"
-                            class="btn btn-success float-right mr-4 mt-2">Detail</a>
-                    </div> --}}
                     <div class="card-body">
-                        <table class="table table-bordered table-hover" id="">
+                        <table class="table {{ $unit->name }} table-bordered table-hover" id="">
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
@@ -154,5 +166,21 @@
             autoWidth: false,
         });
     });
+</script>
+<script>
+    // $(document).ready(function(){
+    //     $("#employees").on("input", function () {
+    //     var value = $(this).val().toLowerCase();
+    //     if (value === "all") {
+    //             $(`table tbody tr`).show();
+    //         } else {
+    //             var filteredRows = $("table tbody tr").filter(function () {
+    //                 return $(this).text().toLowerCase().indexOf(value) > -1;
+    //             });
+    //             $("table tbody tr").hide(); // Sembunyikan semua baris terlebih dahulu
+    //             filteredRows.toggle(); // Tampilkan baris yang sesuai dengan pencarian
+    //         }
+    //     });
+    // });
 </script>
 @endsection

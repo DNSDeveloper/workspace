@@ -36,14 +36,31 @@ class TaskController extends Controller
             $request->file->move(public_path($destinationPath), $filename);
         }
         $task = Task::where('id', $id)->first();
-        $task->update([
-            'status' => $request->status,
-            'completed_time' => $request->status == 'done' ? date('Y-m-d H:i:s') : null,
-            'attach_done'=> $request->status == 'done' ? $filename : null,
-            'report_done'=> $request->report
-        ]);
-        $request->session()->flash('success', 'Task Successfully Updated');
-        return redirect()->back();
+
+        // if($request->status == 'on progress') {
+        //     $task->update([
+        //         'status'=> $request->status
+        //     ]);
+        //     $request->session()->flash('success', 'Task Successfully Updated');
+        //     return redirect()->back();  
+        // } else {
+        //     $checkSubtask = Subtask::where('task_id',$task->id)
+        //     ->whereIn('status',['open','on progress'])
+        //     ->first();
+        //     if(!$checkSubtask) {
+        //         $task->update([
+        //             'status' => $request->status,
+        //             'completed_time' => $request->status == 'done' ? date('Y-m-d H:i:s') : null,
+        //             'attach_done'=> $request->file ? $filename : null,
+        //             'report_done'=> $request->report
+        //         ]);
+        //         $request->session()->flash('success', 'Task Successfully Updated');
+        //         return redirect()->back();   
+        //     } else {
+        //         $request->session()->flash('error','Ada Subtask yang masih belum selesai');
+        //         return redirect()->back();
+        //     }   
+        // }
     }
     public function update_subtask(Request $request, $id)
     {

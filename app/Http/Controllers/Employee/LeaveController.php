@@ -31,31 +31,24 @@ class LeaveController extends Controller
 
     public function store(Request $request, $employee_id) {
         $red=route('employee.leaves.create');
-        $cb = $request->input('date');
-        $cb2 = strtotime("+3 Days");
-        $cb3 = date("d",$cb2);
-        $cb4 = date('d',(strtotime ( '-1 day' , strtotime ($cb))));
-        // dd($cb3,date('d', strtotime($cb)));
-            //$start = $request->input('start_date');
-            [$start, $end] = explode(' - ', $request->input('date_range'));
-            $start = Carbon::parse($start);
-            $end = Carbon::parse($end);
-            $str=date('d',strtotime($start));
-        // dd(date('d',strtotime($cb)) > date('d'),$str > date('d',strtotime($cb)));
-        // if($request->input('reason')=="Sakit" && ((date('d',strtotime($cb)) > date('d') || $str > date('d',strtotime($cb))))) {
-        //     echo'<script>alert("'.$str.' Izin Sakit hanya bisa diajukan maksimal H+3 sejak tanggal ketidakhadiran");window.location="'.$red.'";</script>';
-        // }
-        // else if($request->input('reason')=="Cuti" && (date('d', strtotime($cb)>=$cb4 || $str>=$cb4 || $cb>date('d') || $str>date('d')))) {
-        //     echo'<script>alert("'.$str.'Izin Cuti hanya bisa diajukan maksimal H-1 sejak tanggal ketidakhadiran");window.location="'.$red.'";</script>';
+        // $date = date('Y-m-d',strtotime($request->input('date')));
+        
+        // [$start, $end] = explode(' - ', $request->input('date_range'));
+        // $start = date('Y-m-d',strtotime(Carbon::parse($start)));
+        // $end = date('Y-m-d',strtotime(Carbon::parse($end)));
+        // $today = date('Y-m-d');
+        
+        // if($request->input('multiple-days') == 'yes') {
+        //     if($start <= $today || $end <= $start ) {
+        //         $request->session()->flash('error','Pengajuan Cuti hanya bisa dilakukan maksimal H-1 dari tanggal ketidakhadiran');
+        //         return redirect()->back();
+        //     }
         // } else {
-        $day = date('d',strtotime($cb));
-        $month = date('m',strtotime($cb));
-        dd($request->all());
-        // (jika str <= hari ini dan bulan == bulan ini ) || () 
-        if($day <= date('d') && $str <= date('d')) {
-            $request->session()->flash('error','Pengajuan Cuti hanya bisa dilakukan maksimal H-1 dari tanggal ketidakhadiran');
-            return redirect()->back();
-        }
+        //     if($date <= $today) {
+        //         $request->session()->flash('error','Pengajuan Cuti hanya bisa dilakukan maksimal H-1 dari tanggal ketidakhadiran');
+        //         return redirect()->back();    
+        //     }
+        // }
         $data = [
             'employee' => Auth::user()->employee
         ];

@@ -12,7 +12,7 @@
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item">
-                        <a href="{{ route('employee.index') }}">Dashboard Karyawan</a>
+                        <a href="{{ route('admin.index') }}">Dashboard Admin</a>
                     </li>
                     <li class="breadcrumb-item active">
                         Detail Task
@@ -85,23 +85,26 @@
                                 </tr>
                                 <tr>
                                     <td>Percentage</td>
-                                    <td>@if(($task->completed_time != null) &&
-                                        date('Y-m-d H:i:s',strtotime($task->completed_time)) < date('Y-m-d
-                                            H:i:s',strtotime($task->deadline)))
+                                    <td>
+                                        @if(($task->completed_time != null) &&
+                                        ((date('Y-m-d',strtotime($task->completed_time))
+                                        < date('Y-m-d',strtotime($task->deadline))) && (date('H:i:s',strtotime($task->completed_time))
+                                        < date('H:i:s',strtotime($task->deadline)))))
                                             <div class="badge badge-success">
                                                 110%
                                             </div>
                                             @elseif(($task->completed_time != null) &&
-                                            date('Y-m-d H:i:s',strtotime($task->completed_time) ==
-                                            date('Y-m-d H:i:s', strtotime($task->deadline))))
+                                            ((date('Y-m-d',strtotime($task->completed_time))
+                                        == date('Y-m-d',strtotime($task->deadline))) && (date('H:i:s',strtotime($task->completed_time))
+                                        < date('H:i:s',strtotime($task->deadline)))))
                                             <div class="badge badge-primary">
                                                 100%
                                             </div>
                                             @elseif(($task->completed_time != null) &&
-                                            date('Y-m-d H:i:s',strtotime($task->completed_time) >
-                                            date('Y-m-d H:i:s',strtotime($task->deadline)) ))
+                                           ((date('Y-m-d',strtotime($task->completed_time))
+                                        > date('Y-m-d',strtotime($task->deadline)))))
                                             <div class="badge badge-warning">
-                                                90%
+                                                80%
                                             </div>
                                             @else
                                             <div class="badge badge-danger">
@@ -115,8 +118,7 @@
                                 </tr>
                                 <tr>
                                     <td>Attach Done</td>
-                                    <td><a {{ $task->attach_done == null ? 'hidden' : '' }} href="{{
-                                            asset($task->attach_done) }}">Click Here</a></td>
+                                    <td><a href="{{ $task->attach_done == null ? '#': url($task->attach_done) }}" target="_blank" {{ $task->attach_done == null ? 'hidden' : '' }} >Click Here</a></td>
                                 </tr>
                                 <tr>
                                     <td>Report Done</td>
@@ -164,22 +166,24 @@
                                             <div class="row">
                                                 Status :
                                                 @if(($subtask->completed_time != null) &&
-                                                date('Y-m-d H:i:s',strtotime($subtask->completed_time))
-                                                < date('Y-m-d H:i:s',strtotime($subtask->deadline)))
+                                                ((date('Y-m-d',strtotime($subtask->completed_time))
+                                                < date('Y-m-d',strtotime($subtask->deadline))) && (date('H:i:s',strtotime($subtask->completed_time))
+                                                < date('H:i:s',strtotime($subtask->deadline)))))
                                                     <div class="badge badge-success">
                                                         110%
                                                     </div>
                                                     @elseif(($subtask->completed_time != null) &&
-                                                    (date('Y-m-d H:i:s',strtotime($subtask->completed_time)) ==
-                                                    date('Y-m-d H:i:s',strtotime($subtask->deadline)) ))
+                                                    ((date('Y-m-d',strtotime($subtask->completed_time))
+                                                == date('Y-m-d',strtotime($subtask->deadline))) && (date('H:i:s',strtotime($subtask->completed_time))
+                                                < date('H:i:s',strtotime($subtask->deadline)))))
                                                     <div class="badge badge-primary">
                                                         100%
                                                     </div>
                                                     @elseif(($subtask->completed_time != null) &&
-                                                    date('Y-m-d H:i:s',strtotime($subtask->completed_time) >
-                                                    date('Y-m-d H:i:s',strtotime($subtask->deadline)) ))
+                                                   ((date('Y-m-d',strtotime($subtask->completed_time))
+                                                > date('Y-m-d',strtotime($subtask->deadline)))))
                                                     <div class="badge badge-warning">
-                                                        90%
+                                                        80%
                                                     </div>
                                                     @else
                                                     <div class="badge badge-danger">
@@ -197,10 +201,9 @@
                                             <span class="badge badge-danger">{{ ucwords($subtask->status) }}</span>
                                             @endif
                                         </td>
-                                        <td><a target="_blank" href="{{ asset($subtask->file) }}" {{ $subtask->file ==
+                                        <td><a target="_blank" href="{{ $subtask->file == null ? '#': url($subtask->file) }}" {{ $subtask->file ==
                                                 null ? 'hidden' : '' }}>Click Here</a></td>
-                                        <td><a {{ $subtask->attach_done == null ? 'hidden' : '' }} target="_blank"
-                                                href="{{ asset($subtask->attach_done) }}">Click Here</a></td>
+                                        <td><a target="_blank" href="{{ $subtask->attach_done == null ? '#': url($subtask->attach_done) }}" {{ $subtask->attach_done == null ? 'hidden' : '' }} >Click Here</a></td>
                                         <td>{{ $subtask->report_done }}</td>
                                     </tr>
                                     @endforeach

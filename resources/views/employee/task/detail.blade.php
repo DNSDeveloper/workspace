@@ -24,27 +24,28 @@
 </div>
 <section class="content">
     <div class="container-fluid">
-        <div class="modal fade" id="updatetask{{ $task->id }}" tabindex="-1"
-            role="dialog" aria-labelledby="updatetaskLabel" aria-hidden="true">
+        <div class="modal fade" id="updatetask{{ $task->id }}" tabindex="-1" role="dialog"
+            aria-labelledby="updatetaskLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="updatetaskLabel">Update Status</h5>
-                        <button type="button" class="close" data-dismiss="modal"
-                            aria-label="Close">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form action="{{ route('employee.task.update',$task->id ) }}"
-                        method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('employee.task.update',$task->id ) }}" method="POST"
+                        enctype="multipart/form-data">
                         @csrf
                         <div class="modal-body">
                             <div class="form-group mb-3">
                                 <label for="">Status</label>
-                                <select class="form-control" name="status" id="status" onchange="toggleReportTask(this)">
+                                <select class="form-control" name="status" id="status"
+                                    onchange="toggleReportTask(this)">
                                     <option value="" hidden disabled selected value>--
                                         Choose Status --</option>
-                                    <option value="on progress" {{ $task->status == 'on progress' ? 'hidden' : '' }}>On Progress</option>
+                                    <option value="on progress" {{ $task->status == 'on progress' ? 'hidden' : '' }}>On
+                                        Progress</option>
                                     <option value="done">Done</option>
                                 </select>
                             </div>
@@ -53,7 +54,7 @@
                                     <label for="">Attachment</label>
                                     <input type="file" name="file" class="form-control" id="">
                                 </div>
-                                    
+
                                 <div class="form-group mb-3">
                                     <label for="">Report</label>
                                     <textarea name="report" class="form-control" id="" cols="30" rows="3"></textarea>
@@ -61,8 +62,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary"
-                                data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary">Save</button>
                         </div>
                     </form>
@@ -74,8 +74,10 @@
             <div class="card-body">
                 <nav>
                     <div class="nav nav-tabs d-flex justify-content-around" id="nav-tab" role="tablist">
-                        <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Task</a>
-                        <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Subtask</a>
+                        <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home"
+                            role="tab" aria-controls="nav-home" aria-selected="true">Task</a>
+                        <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile"
+                            role="tab" aria-controls="nav-profile" aria-selected="false">Subtask</a>
                     </div>
                 </nav>
                 <div class="tab-content" id="nav-tabContent">
@@ -155,29 +157,32 @@
                                             Percentage
                                         </b>
                                     </td>
-                                    <td>@if(($task->completed_time != null) &&
-                                       ( date('Y-m-d H:i:s',strtotime($task->completed_time)) < 
-                                       date('Y-m-d H:i:s',strtotime($task->deadline))))
+                                    <td>
+                                        @if(($task->completed_time != null) &&
+                                        ((date('Y-m-d',strtotime($task->completed_time))
+                                        < date('Y-m-d',strtotime($task->deadline)))))
                                             <div class="badge badge-success">
                                                 110%
                                             </div>
                                             @elseif(($task->completed_time != null) &&
-                                            (date('Y-m-d H:i:s',strtotime($task->completed_time)) ==
-                                            date('Y-m-d H:i:s', strtotime($task->deadline))))
-                                            <div class="badge badge-primary">
-                                                100%
-                                            </div>
-                                            @elseif(($task->completed_time != null) &&
-                                            (date('Y-m-d H:i:s',strtotime($task->completed_time) )>
-                                            date('Y-m-d H:i:s',strtotime($task->deadline)) ))
-                                            <div class="badge badge-warning">
-                                                80%
-                                            </div>
-                                            @else
-                                            <div class="badge badge-danger">
-                                                0%
-                                            </div>
-                                            @endif</td>
+                                            ((date('Y-m-d',strtotime($task->completed_time))
+                                            == date('Y-m-d',strtotime($task->deadline))) &&
+                                            (date('H:i:s',strtotime($task->completed_time))
+                                            < date('H:i:s',strtotime($task->deadline))) ))
+                                                <div class="badge badge-primary">
+                                                    100%
+                                                </div>
+                                                @elseif(($task->completed_time != null) &&
+                                                ((date('Y-m-d',strtotime($task->completed_time))
+                                                > date('Y-m-d H:',strtotime($task->deadline)))))
+                                                <div class="badge badge-warning">
+                                                    80%
+                                                </div>
+                                                @else
+                                                <div class="badge badge-danger">
+                                                    0%
+                                                </div>
+                                                @endif
                                 </tr>
                                 <tr>
                                     <td>
@@ -192,7 +197,7 @@
                                         <b>
                                             Attach Done
                                         </b>
-                                        
+
                                     </td>
                                     <td><a {{ $task->attach_done == null ? 'hidden' : '' }} href="{{
                                             asset($task->attach_done) }}">Click Here</a></td>
@@ -202,14 +207,15 @@
                                         <b>
                                             Report Done
                                         </b>
-                                        
+
                                     </td>
                                     <td>{{ $task->report_done == null ? '-': $task->report_done }}</td>
                                 </tr>
                             </tbody>
                         </table>
-                        @if($task->status != 'done')                            
-                        <button class="btn btn-success float-right" data-toggle="modal" data-target="#updatetask{{ $task->id }}"> <i class="fas fa-edit"></i> Update</button>
+                        @if($task->status != 'done')
+                        <button class="btn btn-success float-right" data-toggle="modal"
+                            data-target="#updatetask{{ $task->id }}"> <i class="fas fa-edit"></i> Update</button>
                         @endif
                     </div>
                     <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
@@ -245,22 +251,23 @@
                                             <div class="row">
                                                 Status :
                                                 @if(($subtask->completed_time != null) &&
-                                                date('Y-m-d H:i:s',strtotime($subtask->completed_time))
-                                                < date('Y-m-d H:i:s',strtotime($subtask->deadline)))
-                                                    <div class="badge badge-success">
-                                                        110%
-                                                    </div>
-                                                    @elseif(($subtask->completed_time != null) &&
-                                                    date('Y-m-d H:i:s',strtotime($subtask->completed_time) ==
-                                                    date('Y-m-d H:i:s',strtotime($subtask->deadline)) ))
+                                        ((date('Y-m-d',strtotime($subtask->completed_time))
+                                        < date('Y-m-d',strtotime($subtask->deadline)))))
+                                                <div class="badge badge-success">
+                                                    110%
+                                                </div>
+                                                @elseif(($subtask->completed_time != null) &&
+                                                ((date('Y-m-d',strtotime($subtask->completed_time))
+                                                == date('Y-m-d',strtotime($subtask->deadline))) && (date('H:i:s',strtotime($subtask->completed_time))
+                                                < date('H:i:s',strtotime($subtask->deadline))) ))
                                                     <div class="badge badge-primary">
                                                         100%
                                                     </div>
                                                     @elseif(($subtask->completed_time != null) &&
-                                                    date('Y-m-d H:i:s',strtotime($subtask->completed_time) >
-                                                    date('Y-m-d H:i:s',strtotime($subtask->deadline)) ))
+                                                    ((date('Y-m-d H:i:s',strtotime($subtask->completed_time))
+                                                    > date('Y-m-d H:i:s',strtotime($subtask->deadline)))))
                                                     <div class="badge badge-warning">
-                                                        90%
+                                                        80%
                                                     </div>
                                                     @else
                                                     <div class="badge badge-danger">
@@ -280,7 +287,8 @@
                                         </td>
                                         <td><a target="_blank" href="{{ asset($subtask->file) }}" {{ $subtask->file ==
                                                 null ? 'hidden' : '' }}>Click Here</a></td>
-                                        <td><a {{ $subtask->attach_done == null ? 'hidden' : '' }} target="_blank" href="{{ asset($subtask->attach_done) }}">Click Here</a></td>
+                                        <td><a {{ $subtask->attach_done == null ? 'hidden' : '' }} target="_blank"
+                                                href="{{ asset($subtask->attach_done) }}">Click Here</a></td>
                                         <td>{{ $subtask->report_done }}</td>
                                     </tr>
                                     @endforeach

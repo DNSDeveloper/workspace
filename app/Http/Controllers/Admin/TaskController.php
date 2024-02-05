@@ -17,7 +17,8 @@ class TaskController extends Controller
     {
         $units = Unit::with('tasks')
         ->get();
-        return view('admin.task.index', compact('units'));
+        $employees= Employee::get();
+        return view('admin.task.index', compact('units','employees'));
     }
 
     public function create()

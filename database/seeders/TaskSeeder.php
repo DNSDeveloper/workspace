@@ -26,7 +26,7 @@ class TaskSeeder extends Seeder
             'task' => 'Create Aplikasi Absen',
             'deadline' => '2024-02-01 17:00:00',
             'note' => 'Jangan Lupa dikerjain',
-            'status' => 'done',
+            'status' => 'open',
             'is_priority' => 1,
         ]);
         Task::create([
@@ -39,7 +39,7 @@ class TaskSeeder extends Seeder
             'task' => 'Edit Video',
             'deadline' => '2024-02-01 17:00:00',
             'note' => 'Jangan Lupa dikerjain',
-            'status' => 'done',
+            'status' => 'open',
             'is_priority' => 0,
         ]);
 
@@ -48,14 +48,14 @@ class TaskSeeder extends Seeder
             'employee_id'=> 2,
             'description'=> 'tes',
             'deadline'=>'2024-02-01 17:00:00' ,
-            'status'=> 'done'
+            'status'=> 'open'
         ]);
         Subtask::create([
             'task_id' => 2,
             'employee_id'=> 1,
             'description'=> 'tes',
             'deadline'=>'2024-02-01 17:00:00' ,
-            'status'=> 'done'
+            'status'=> 'open'
         ]);
     }
 }
