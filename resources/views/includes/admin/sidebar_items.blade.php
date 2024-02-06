@@ -105,7 +105,14 @@
         </li>
     </ul>
 </li>
-
+<li class="nav-item">
+    <a href="{{ route('admin.reimbursements.index') }}" class="nav-link">
+        <i style="color: white;opacity:1" class="nav-icon fa fa-exchange"></i>
+        <p style="color: white;opacity: 1;">
+            Reimbursements
+        </p>
+    </a>
+</li>
 <!-- <li class="nav-item has-treeview">
     <a href="#" class="nav-link">
         <i style="color:white; opacity:1" class="nav-icon fa fa-calendar-minus-o"></i>

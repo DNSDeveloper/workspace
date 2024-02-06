@@ -16,14 +16,16 @@ return new class extends Migration
         Schema::create('reimbursements', function (Blueprint $table) {
             $table->id();
             $table->foreignId('employee_id')->constrained();
-            // $table->date('tanggal_reimbursement');
-            // $table->string('minggu');
-            // $table->string('jenis');
-            // $table->text('deskripsi');
-            // $table->bigInteger('nominal');
-            // $table->date('tanggal_transfer');
-            // $table->string('file');
-            // $table->string('status');
+            $table->date('tanggal_reimbursement');
+            $table->string('minggu');
+            $table->string('jenis');
+            $table->text('deskripsi');
+            $table->bigInteger('nominal');
+            $table->date('tanggal_transfer');
+            $table->string('file_employee');
+            $table->string('file_admin');
+            $table->string('status');
+            $table->string('catetan');
             $table->timestamps();
         });
     }
