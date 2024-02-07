@@ -44,7 +44,7 @@
                                     onchange="toggleReportTask(this)">
                                     <option value="" hidden disabled selected value>--
                                         Choose Status --</option>
-                                    <option value="on progress" {{ $task->status == 'on progress' ? 'hidden' : '' }}>On
+                                    <option value="on progress" {{ $task->status == 'on progress' || $task->status == 'confirmed' ? 'hidden' : '' }}>On
                                         Progress</option>
                                     <option value="done">Done</option>
                                 </select>
@@ -126,7 +126,7 @@
                                     </td>
                                     <td> @if($task->status === 'open')
                                         <span class="badge badge-primary">{{ ucwords($task->status) }}</span>
-                                        @elseif($task->status === 'on progress')
+                                        @elseif($task->status === 'on progress' || $task->status == 'confirmed')
                                         <span class="badge badge-warning">{{ ucwords($task->status) }}</span>
                                         @elseif($task->status === 'done')
                                         <span class="badge badge-success">{{ ucwords($task->status) }}</span>
@@ -141,7 +141,7 @@
                                             Deadline
                                         </b>
                                     </td>
-                                    <td>{{ $task->deadline }}</td>
+                                    <td>{{ date('d-m-Y H:i',strtotime($task->deadline)) }}</td>
                                 </tr>
                                 <tr>
                                     <td>
@@ -149,7 +149,7 @@
                                             Solved
                                         </b>
                                     </td>
-                                    <td>{{ $task->completed_time == null ? '-' : $task->completed_time }}</td>
+                                    <td>{{ $task->completed_time == null ? '-' : date('d-m-Y H:i',strtotime($task->completed_time)) }}</td>
                                 </tr>
                                 <tr>
                                     <td>
@@ -214,7 +214,8 @@
                             </tbody>
                         </table>
                         @if($task->status != 'done')
-                        <button class="btn btn-success float-right" data-toggle="modal"
+                        <button title="{{ $task->is_approved == 0 ? 'Waiting Approved by Admin' : '' }}"
+                            {{ $task->is_approved == 0 ? 'disabled' : '' }} class="btn btn-success float-right" data-toggle="modal"
                             data-target="#updatetask{{ $task->id }}"> <i class="fas fa-edit"></i> Update</button>
                         @endif
                     </div>
@@ -242,11 +243,11 @@
                                         <td>
                                             <div class="row">
                                                 Deadline :
-                                                {{ $subtask->deadline }}
+                                                {{ date('d-m-Y H:i',strtotime($subtask->deadline)) }}
                                             </div>
                                             <div class="row">
                                                 Solved :
-                                                {{ $subtask->completed_time }}
+                                                {{ date('d-m-Y H:i',strtotime($subtask->completed_time)) }}
                                             </div>
                                             <div class="row">
                                                 Status :

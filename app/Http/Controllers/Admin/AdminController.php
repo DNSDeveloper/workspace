@@ -93,7 +93,7 @@ class AdminController extends Controller
         
         // dd(Attendance::whereDate('created_at',Carbon::now())->get());
         $reports = DailyReport::whereDate('created_at',today())->get();
-        $attendances = Attendance::get();
+        $attendances = Attendance::whereMonth('created_at',date('m'))->get();
         $days = Carbon::now()->month(date('m'))->daysInMonth; // 28
         return view('admin.index',compact('ranksAttendances','todayAttendances','days','reports','attendances'));
     }

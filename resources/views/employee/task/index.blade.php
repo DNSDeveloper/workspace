@@ -44,7 +44,8 @@
                                         <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
-                                <form action="{{ route('employee.task.store' ) }}" method="post" enctype="multipart/form-data">
+                                <form action="{{ route('employee.task.store' ) }}" method="post"
+                                    enctype="multipart/form-data">
                                     @csrf
                                     <div class="modal-body">
                                         <fieldset>
@@ -60,39 +61,42 @@
                                             <div class="form-group">
                                                 <label for="">Services</label>
                                                 <select name="service" id="service" disabled class="form-control">
-                                                    <option value="" hidden selected disabled value>-- Select Services --</option>
+                                                    <option value="" hidden selected disabled value>-- Select Services
+                                                        --</option>
                                                 </select>
                                             </div>
                                             <div class="form-group">
                                                 <label for="">Task</label>
-                                                <textarea name="task" id="" cols="30" rows="3" class="form-control"></textarea>
+                                                <textarea name="task" id="" cols="30" rows="3"
+                                                    class="form-control"></textarea>
                                                 @error('task')
                                                 <div class="text-danger">
                                                     {{ $message }}
                                                 </div>
                                                 @enderror
                                             </div>
-            
+
                                             <div class="form-group">
                                                 <label for="">Category</label>
                                                 <select name="category" id="" class="form-control">
-                                                    <option value="" hidden disabled selected> -- Select Periodik --</option>
+                                                    <option value="" hidden disabled selected> -- Select Periodik --
+                                                    </option>
                                                     <option value="reguler">Reguler</option>
                                                     <option value="periodik perminggu">Periodik Perminggu</option>
                                                     <option value="periodik perbulan">Periodik Perbulan</option>
                                                 </select>
                                             </div>
-            
+
                                             <label for="">Prioritas</label>
                                             <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="is_priority" id="exampleRadios1"
-                                                    value="1" checked>
+                                                <input class="form-check-input" type="radio" name="is_priority"
+                                                    id="exampleRadios1" value="1" checked>
                                                 <label class="form-check-label" for="exampleRadios1">
                                                     Ya
                                                 </label>
                                                 <br>
-                                                <input class="form-check-input" type="radio" name="is_priority" id="exampleRadios2"
-                                                    value="0">
+                                                <input class="form-check-input" type="radio" name="is_priority"
+                                                    id="exampleRadios2" value="0">
                                                 <label class="form-check-label" for="exampleRadios2">
                                                     Tidak
                                                 </label>
@@ -103,7 +107,8 @@
                                             </div>
                                             <div class="form-group">
                                                 <label for="dob">Note</label>
-                                                <textarea name="note" class="form-control" id="" cols="30" rows="5"></textarea>
+                                                <textarea name="note" class="form-control" id="" cols="30"
+                                                    rows="5"></textarea>
                                             </div>
                                         </fieldset>
                                     </div>
@@ -128,7 +133,8 @@
                                         <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
-                                <form action="{{ route('employee.subtask.store' ) }}" method="post" enctype="multipart/form-data">
+                                <form action="{{ route('employee.subtask.store' ) }}" method="post"
+                                    enctype="multipart/form-data">
                                     @csrf
                                     <div class="modal-body">
                                         <div class="form-group mb-3">
@@ -179,7 +185,8 @@
                     @if(auth()->user()->employee->position->name == 'Leader')
                     <div class="float-right m-3">
                         <div class="gap-3">
-                            <button class="btn btn-primary float-right" {{ $tasks->count() > 0 ? '' : 'disabled' }} data-toggle="modal" data-target="#addtask">
+                            <button class="btn btn-primary float-right" {{ $tasks->count() > 0 ? '' : 'disabled' }}
+                                data-toggle="modal" data-target="#addtask">
                                 Add Subtask <i class="fas fa-plus"></i>
                             </button>
                             <button class="btn btn-primary float-right mr-3" data-toggle="modal" data-target="#owntask">
@@ -206,11 +213,11 @@
                                     <td>{{ $task->user->name }}</td>
                                     <td>{{ $task->unit->name }}</td>
                                     <td>{{ $task->task }}</td>
-                                    <td>{{ $task->deadline }}</td>
+                                    <td>{{ date('d-m-Y H:i',strtotime($task->deadline)) }}</td>
                                     <td>
                                         @if($task->status === 'open')
                                         <span class="badge badge-primary">{{ ucwords($task->status) }}</span>
-                                        @elseif($task->status === 'on progress')
+                                        @elseif($task->status === 'on progress' || $task->status == 'confirmed')
                                         <span class="badge badge-warning">{{ ucwords($task->status) }}</span>
                                         @elseif($task->status === 'done')
                                         <span class="badge badge-success">{{ ucwords($task->status) }}</span>
@@ -237,22 +244,28 @@
                                                         <div class="modal-body">
                                                             <div class="form-group mb-3">
                                                                 <label for="">Status</label>
-                                                                <select class="form-control" name="status" id="status" onchange="toggleReportTask(this)">
+                                                                <select class="form-control" name="status" id="status"
+                                                                    onchange="toggleReportTask(this)">
                                                                     <option value="" hidden disabled selected value>--
                                                                         Choose Status --</option>
-                                                                    <option value="on progress" {{ $task->status == 'on progress' ? 'hidden' : '' }}>On Progress</option>
+                                                                    <option value="on progress" {{ $task->status == 'on
+                                                                        progress' || $task->status == 'confirmed' ?
+                                                                        'hidden' : '' }}>On Progress
+                                                                    </option>
                                                                     <option value="done">Done</option>
                                                                 </select>
                                                             </div>
                                                             <div id="report-{{ $task->id }}">
                                                                 <div class="form-group mb-3">
                                                                     <label for="">Attachment</label>
-                                                                    <input type="file" name="file" class="form-control" id="">
+                                                                    <input type="file" name="file" class="form-control"
+                                                                        id="">
                                                                 </div>
-                                                                    
+
                                                                 <div class="form-group mb-3">
                                                                     <label for="">Report</label>
-                                                                    <textarea name="report" class="form-control" id="" cols="30" rows="3"></textarea>
+                                                                    <textarea name="report" class="form-control" id=""
+                                                                        cols="30" rows="3"></textarea>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -265,11 +278,14 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <button {{ $task->status == 'done' ? 'hidden' : '' }} data-toggle="modal" data-target="#updatetask{{ $task->id }}"
+                                        <button title="{{ $task->is_approved == 0 ? 'Waiting Approved by Admin' : '' }}"
+                                            {{ $task->is_approved == 0 ? 'disabled' : '' }} data-toggle="modal"
+                                            data-target="#updatetask{{ $task->id }}"
                                             class="btn btn-success">
                                             <i class="fas fa-edit"></i>
                                         </button>
-                                        <a href="{{ route('employee.task.detail', $task->id) }}" class="btn btn-warning">
+                                        <a href="{{ route('employee.task.detail', $task->id) }}"
+                                            class="btn btn-warning">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                     </td>
@@ -286,10 +302,11 @@
                                     <td>
                                         {{ $subtask->task->task }} : {{ $subtask->description }}
                                         <br>
-                                        <a href="{{ asset($subtask->file) }}" target="_blank" {{ $subtask->file == null ? 'hidden': '' }}>Click Here</a>
+                                        <a href="{{ asset($subtask->file) }}" target="_blank" {{ $subtask->file == null
+                                            ? 'hidden': '' }}>Click Here</a>
                                     </td>
                                     <td>
-                                        {{ $subtask->deadline }}
+                                        {{ date('d-m-Y H:i',strtotime($subtask->deadline)) }}
                                     </td>
                                     <td>
                                         @if($subtask->status === 'open')
@@ -320,22 +337,28 @@
                                                         <div class="modal-body">
                                                             <div class="form-group mb-3">
                                                                 <label for="">Status</label>
-                                                                <select class="form-control" name="status" id="status-subtask" onchange="toggleReportSubtask(this)">
+                                                                <select class="form-control" name="status"
+                                                                    id="status-subtask"
+                                                                    onchange="toggleReportSubtask(this)">
                                                                     <option value="" hidden disabled selected value>--
                                                                         Choose Status --</option>
-                                                                    <option value="on progress" {{ $subtask->status == 'on progress' ? 'hidden' : '' }}>On Progress</option>
+                                                                    <option value="on progress" {{ $subtask->status ==
+                                                                        'on progress' ? 'hidden' : '' }}>On Progress
+                                                                    </option>
                                                                     <option value="done">Done</option>
                                                                 </select>
                                                             </div>
                                                             <div id="report-subtask-{{ $subtask->id }}">
                                                                 <div class="form-group mb-3">
                                                                     <label for="">Attachment</label>
-                                                                    <input type="file" name="file" class="form-control" id="">
+                                                                    <input type="file" name="file" class="form-control"
+                                                                        id="">
                                                                 </div>
-                                                                    
+
                                                                 <div class="form-group mb-3">
                                                                     <label for="">Report</label>
-                                                                    <textarea name="report" class="form-control" id="" cols="30" rows="3"></textarea>
+                                                                    <textarea name="report" class="form-control" id=""
+                                                                        cols="30" rows="3"></textarea>
                                                                 </div>
                                                             </div>
                                                         </div>

@@ -59,8 +59,9 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($unit->tasks->where('status','done') as $task)
-                                <tr style="background-color:  {{ ($task->status == 'open' || $task->status == 'on progress') 
+                                @foreach ($unit->tasks->whereIn('status',['done','cancel'])->sortByDesc('created_at') as
+                                $task)
+                                <tr style="background-color:  {{ ($task->status == 'open' || $task->status == 'on progress' || $task->status == 'confirmed') 
                                     && $task->deadline < today() ? 'antiquewhite' : 'white'}} ">
                                     <th>{{ $loop->iteration }}</th>
                                     <td>{{ $task->user->name}}</td>
@@ -73,7 +74,7 @@
                                     <td>
                                         @if($task->status === 'open')
                                         <span class="badge badge-primary">{{ ucwords($task->status) }}</span>
-                                        @elseif($task->status === 'on progress')
+                                        @elseif($task->status === 'on progress' || $task->status == 'confirmed')
                                         <span class="badge badge-warning">{{ ucwords($task->status) }}</span>
                                         @elseif($task->status === 'done')
                                         <span class="badge badge-success">{{ ucwords($task->status) }}</span>

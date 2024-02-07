@@ -22,13 +22,13 @@ Route::get('/', function () {
 
 
 
-Auth::routes(['register' => Register2Controller::class,'register']);
-Route::get('/employees/list-employees', [Register2Controller::class,'index'])->name('register.index');
-    Route::get('/employees/add-employee', [Register2Controller::class,'create'])->name('register.create');
-    Route::post('/employees', [RegisterController::class,'store'])->name('register.store');
+Auth::routes(['register' => Register2Controller::class, 'register']);
+Route::get('/employees/list-employees', [Register2Controller::class, 'index'])->name('register.index');
+Route::get('/employees/add-employee', [Register2Controller::class, 'create'])->name('register.create');
+Route::post('/employees', [RegisterController::class, 'store'])->name('register.store');
 Route::get('/home', 'HomeController@index')->name('home');
 
-Route::namespace('Admin')->prefix('admin')->name('admin.')->middleware(['auth','can:admin-access'])->group(function () {
+Route::namespace('Admin')->prefix('admin')->name('admin.')->middleware(['auth', 'can:admin-access'])->group(function () {
     Route::get('/', 'AdminController@index')->name('index');
     Route::get('/reset-password', 'AdminController@reset_password')->name('reset-password');
     Route::put('/update-password', 'AdminController@update_password')->name('update-password');
@@ -73,17 +73,21 @@ Route::namespace('Admin')->prefix('admin')->name('admin.')->middleware(['auth','
     Route::put('/holidays/{holiday_id}', 'HolidayController@update')->name('holidays.update');
     Route::delete('/holidays/{holiday_id}', 'HolidayController@destroy')->name('holidays.delete');
 
-    Route::get('/services','ServiceController@index')->name('services.index');
-    Route::post('/services/store','ServiceController@store')->name('services.store');
-    Route::post('/services/update/{id}','ServiceController@update')->name('services.update');
+    Route::get('/services', 'ServiceController@index')->name('services.index');
+    Route::post('/services/store', 'ServiceController@store')->name('services.store');
+    Route::post('/services/update/{id}', 'ServiceController@update')->name('services.update');
 
-    Route::get('/positions','PositionController@index')->name('positions.index');
-    Route::post('/positions/store','PositionController@store')->name('positions.store');
-    Route::post('/positions/update/{id}','PositionController@update')->name('positions.update');
+    Route::get('/positions', 'PositionController@index')->name('positions.index');
+    Route::post('/positions/store', 'PositionController@store')->name('positions.store');
+    Route::post('/positions/update/{id}', 'PositionController@update')->name('positions.update');
+
+    Route::get('/reimbursements', 'ReimbursementController@index')->name('reimbursements.index');
+    // Route::post('/reimbursements/store', 'PositionController@store')->name('reimbursements.store');
+    Route::post('/reimbursements/update/{id}', 'ReimbursementController@update')->name('reimbursements.update');
     // Routes for holidays //
 });
 
-Route::namespace('Employee')->prefix('employee')->name('employee.')->middleware(['auth','can:employee-access'])->group(function () {
+Route::namespace('Employee')->prefix('employee')->name('employee.')->middleware(['auth', 'can:employee-access'])->group(function () {
     Route::get('/', 'EmployeeController@index')->name('index');
     Route::get('/profile', 'EmployeeController@profile')->name('profile');
     Route::get('/profile-edit/{employee_id}', 'EmployeeController@profile_edit')->name('profile-edit');
@@ -127,11 +131,16 @@ Route::namespace('Employee')->prefix('employee')->name('employee.')->middleware(
     // Routes for Self //
 
     // Routes for Task //
-    Route::get('/task','TaskController@index')->name('task');
-    Route::post('/update-task/{id}','TaskController@update_task')->name('task.update');
-    Route::post('/update-subtask/{id}','TaskController@update_subtask')->name('subtask.update');
-    Route::get('/task/history','TaskController@history')->name('task.history');
-    Route::post('/task/store','TaskController@store')->name('task.store');
-    Route::post('/subtask/store','TaskController@store_subtask')->name('subtask.store');
-    Route::get('/task/detail/{id}','TaskController@detail')->name('task.detail');
+    Route::get('/task', 'TaskController@index')->name('task');
+    Route::post('/update-task/{id}', 'TaskController@update_task')->name('task.update');
+    Route::post('/update-subtask/{id}', 'TaskController@update_subtask')->name('subtask.update');
+    Route::get('/task/history', 'TaskController@history')->name('task.history');
+    Route::post('/task/store', 'TaskController@store')->name('task.store');
+    Route::post('/subtask/store', 'TaskController@store_subtask')->name('subtask.store');
+    Route::get('/task/detail/{id}', 'TaskController@detail')->name('task.detail');
+
+    Route::get('/reimbursements', 'ReimbursementController@index')->name('reimbursements.index');
+    Route::post('/reimbursements/store', 'ReimbursementController@store')->name('reimbursements.store');
+    Route::post('/reimbursements/update/{id}', 'ReimbursementController@update')->name('reimbursements.update');
+
 });

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Employee;
 use App\Http\Controllers\Controller;
 use App\Service;
+use App\Subtask;
 use App\Task;
 use App\Unit;
 use App\User;
@@ -18,7 +19,9 @@ class TaskController extends Controller
         $units = Unit::with('tasks')
         ->get();
         $employees= Employee::get();
-        return view('admin.task.index', compact('units','employees'));
+        $needConfirmed = Task::where('is_approved',0)->get();
+        $subtasks = Subtask::orderBy('created_at', 'desc')->get();
+        return view('admin.task.index', compact('units','employees','needConfirmed','subtasks'));
     }
 
     public function create()
@@ -86,7 +89,8 @@ class TaskController extends Controller
     public function approved_task($id) {
         $task = Task::where('id',$id)->first();
         $task->update([
-            'is_approved'=> 1 
+            'is_approved'=> 1,
+            'status'=> 'confirmed'
         ]);
         return redirect()->route('admin.task.index')->with('success','Task Berhasil di Approved');
     }
