@@ -118,14 +118,16 @@
                                                     @method('PUT')
                                                         <div class="form-group text-center">
                                                             <label for="">Pilih Status</label>
-                                                            <select name="status" class="form-control text-center mx-auto" style="width:50%">
+                                                            <select id="status" name="status" class="form-control text-center mx-auto" style="width:50%" onchange="toggleStatusCuti(this)">
                                                                 <option hidden disabled selected value> ---- </option>
                                                                 <option value="pending">Pending</option>
                                                                 <option value="approved">Diterima</option>
                                                                 <option value="declined">Ditolak</option>
                                                             </select>
                                                         </div>
-                                                        
+                                                        <div style="display: none" id="leaves-{{ $leaves->get($i-1)->id }}" class="form-group">
+                                                            <textarea class="form-control" name="decline_reason" id="decline_reason" cols="30" rows="3" placeholder="Reason"></textarea>
+                                                        </div>
                                                 </div>
                                                 <div class="card-footer text-center">
                                                     <button type="submit" class="btn flat btn-info">Update</button>
@@ -169,5 +171,25 @@ $(document).ready(function(){
         trigger: 'hover'
     });
 });
+</script>
+<script>
+    function toggleStatusCuti(selectElement) {
+        var task = selectElement.closest('.modal').id.replace('deleteModalCenter', '');
+
+        // Dapatkan elemen select
+        var statusSelect = selectElement;
+        // Dapatkan elemen report-subtask
+        var reportTask = document.getElementById('leaves-' + task);
+        reportTask.style.display = 'none';
+
+        // Periksa nilai yang dipilih pada elemen select
+        if (statusSelect.value != 'declined') {
+            // Jika nilai 'done', tampilkan report-subtask
+            reportTask.style.display = 'none';
+        } else {
+            // Jika nilai 'on progress' atau nilai lainnya, sembunyikan report-subtask
+            reportTask.style.display = 'block';
+        }
+    }
 </script>
 @endsection

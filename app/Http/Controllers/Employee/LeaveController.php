@@ -31,24 +31,24 @@ class LeaveController extends Controller
 
     public function store(Request $request, $employee_id) {
         $red=route('employee.leaves.create');
-        // $date = date('Y-m-d',strtotime($request->input('date')));
+        $date = date('Y-m-d',strtotime($request->input('date')));
         
-        // [$start, $end] = explode(' - ', $request->input('date_range'));
-        // $start = date('Y-m-d',strtotime(Carbon::parse($start)));
-        // $end = date('Y-m-d',strtotime(Carbon::parse($end)));
-        // $today = date('Y-m-d');
+        [$start, $end] = explode(' - ', $request->input('date_range'));
+        $start = date('Y-m-d',strtotime(Carbon::parse($start)));
+        $end = date('Y-m-d',strtotime(Carbon::parse($end)));
+        $today = date('Y-m-d');
         
-        // if($request->input('multiple-days') == 'yes') {
-        //     if($start <= $today || $end <= $start ) {
-        //         $request->session()->flash('error','Pengajuan Cuti hanya bisa dilakukan maksimal H-1 dari tanggal ketidakhadiran');
-        //         return redirect()->back();
-        //     }
-        // } else {
-        //     if($date <= $today) {
-        //         $request->session()->flash('error','Pengajuan Cuti hanya bisa dilakukan maksimal H-1 dari tanggal ketidakhadiran');
-        //         return redirect()->back();    
-        //     }
-        // }
+        if($request->reason == 'cuti' && $request->input('multiple-days') == 'yes') {
+            if($start <= $today || $end <= $start ) {
+                $request->session()->flash('error','Pengajuan Cuti hanya bisa dilakukan maksimal H-1 dari tanggal ketidakhadiran');
+                return redirect()->back();
+            }
+        } elseif($request->reason == 'cuti') {
+            if($date <= $today) {
+                $request->session()->flash('error','Pengajuan Cuti hanya bisa dilakukan maksimal H-1 dari tanggal ketidakhadiran');
+                return redirect()->back();    
+            }
+        }
         $data = [
             'employee' => Auth::user()->employee
         ];
