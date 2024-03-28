@@ -20,6 +20,12 @@
                 <p style="color:white;opacity:1">Position</p>
             </a>
         </li>
+        <li class="nav-item">
+            <a href="{{ route('admin.holidays.index') }}" class="nav-link">
+                <i style="color:white; opacity:1" class="far fa-circle nav-icon"></i>
+                <p style="color:white;opacity:1">Holidays</p>
+            </a>
+        </li>
     </ul>
 </li>
 <li class="nav-item has-treeview">
@@ -68,15 +74,6 @@
                 <p style="color:white;opacity:1">Leaves</p>
             </a>
         </li>
-        <!-- <li class="nav-item">
-            <a
-                href="{{ route('admin.expenses.index') }}"
-                class="nav-link"
-            >
-                <i style="color:white; opacity:1" class="far fa-circle nav-icon"></i>
-                <p style="color:white;opacity:1">Expenses</p>
-            </a>
-        </li> -->
     </ul>
 </li>
 <li class="nav-item has-treeview">
@@ -110,6 +107,14 @@
         <i style="color: white;opacity:1" class="nav-icon fa fa-exchange"></i>
         <p style="color: white;opacity: 1;">
             Reimbursements
+        </p>
+    </a>
+</li>
+<li class="nav-item">
+    <a href="{{ route('admin.bkinerja.index') }}" class="nav-link">
+        <i style="color: white;opacity:1" class="nav-icon fa fa-percent"></i>
+        <p style="color: white;opacity: 1;">
+            Bonus Kinerja
         </p>
     </a>
 </li>

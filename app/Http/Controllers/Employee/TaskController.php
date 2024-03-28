@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Subtask;
 use App\Task;
 use App\Unit;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -53,6 +54,17 @@ class TaskController extends Controller
                     'attach_done'=> $request->file ? $filename : null,
                     'report_done'=> $request->report
                 ]);
+                $phone = $task->employee->phone;
+                $name = str_replace(' ', "%20", $task->employee->first_name . ' '. $task->employee->last_name);
+                $service = "M009";
+                $taskId = $task->id;
+                $taskName = str_replace(" ", "%20", $task->task);
+                $taskCreator = str_replace(" ", "%20", $task->user->name);
+                
+                $client = new Client();
+                $url = env("API_URL")  . $phone . '?' . 'name=' . $name . '&service=' . $service . '&taskId=' . $taskId . '&task=' . $taskName . '&taskCreator=' . $taskCreator;
+                $storeToBot = $client->post($url);
+        
                 $request->session()->flash('success', 'Task Successfully Updated');
                 return redirect()->back();   
             } else {
@@ -100,6 +112,17 @@ class TaskController extends Controller
             'status'=> 'open',
             'is_approved'=> '0',
         ]);
+        $phone = $task->employee->phone;
+        $name = str_replace(' ', "%20", $task->employee->first_name . ' '. $task->employee->last_name);
+        $service = "M001";
+        $taskId = $task->id;
+        $taskName = str_replace(" ", "%20", $task->task);
+        $taskCreator = str_replace(" ", "%20", $task->user->name);
+        
+        $client = new Client();
+        $url = env("API_URL")  . $phone . '?' . 'name=' . $name . '&service=' . $service . '&taskId=' . $taskId . '&task=' . $taskName . '&taskCreator=' . $taskCreator;
+        $storeToBot = $client->post($url);
+        
         if ($task) {
             $request->session()->flash('success', "Task Berhasil ditambahkan, tunggu atasan Approved");
         } else {
@@ -116,7 +139,8 @@ class TaskController extends Controller
             $filename = $destinationPath . '/' . uniqid() . '.'. $typefile;  
             $request->file->move(public_path($destinationPath), $filename);
         }
-        $tasks = Subtask::create([
+        
+        $subtask = Subtask::create([
             'task_id'=> $request->task_id,
             'employee_id'=> $request->employee_id,
             'deadline'=> date('Y-m-d H:i:s', strtotime($request->deadline)),
@@ -125,6 +149,17 @@ class TaskController extends Controller
             'file'=> $request->file != null ? $filename : null,
         ]);
 
+        $phone = $subtask->employee->phone;
+        $name = str_replace(' ', "%20", $subtask->employee->first_name . ' '. $subtask->employee->last_name);
+        $service = "M006";
+        $taskId = $subtask->id;
+        $taskName = str_replace(" ", "%20", $subtask->task->task . " | " . $subtask->description);
+        $taskCreator = str_replace(" ", "%20", $subtask->task->employee->first_name . ' '. $subtask->task->employee->last_name);
+        
+        $client = new Client();
+        $url = env("API_URL")  . $phone . '?' . 'name=' . $name . '&service=' . $service . '&taskId=' . $taskId . '&task=' . $taskName . '&taskCreator=' . $taskCreator;
+        $storeToBot = $client->post($url);
+        
         $request->session()->flash('success','Subtask Successfully Added');
         return redirect()->back();
     }

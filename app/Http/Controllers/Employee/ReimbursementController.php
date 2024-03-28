@@ -2,20 +2,38 @@
 
 namespace App\Http\Controllers\Employee;
 
+use App\Exports\ReimbursementExport;
+use App\Exports\SheetReimbursement;
 use App\Http\Controllers\Controller;
 use App\Reimbursement;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Image;
-
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReimbursementController extends Controller
 {
+    public function thisWeek()
+    {
+        $specificDate = Carbon::now();
+        $startOfMonth = $specificDate->copy()->startOfMonth();
+        $firstDayOfMonth = $startOfMonth->dayOfWeek;
+        $currentWeek = ceil(($specificDate->day + $firstDayOfMonth) / 7);
+        return intval($currentWeek);
+    }
+
     public function index()
     {
-        $reimbursements = Reimbursement::where('employee_id', auth()->user()->employee->id)
-            ->orderBy('created_at', 'DESC')
-            ->get();
-        return view('employee.reimbursements.index', compact('reimbursements'));
+        if (auth()->user()->employee->id == 3) {
+            $reimbursements = Reimbursement::whereMonth('created_at', date('m'))->orderBy('created_at', 'DESC')
+                ->get();
+        } else {
+            $reimbursements = Reimbursement::where('employee_id', auth()->user()->employee->id)
+                ->orderBy('created_at', 'DESC')
+                ->get();
+        }
+        $week = $this->thisWeek();
+        return view('employee.reimbursements.index', compact('reimbursements', 'week'));
     }
 
     public function store(Request $request)
@@ -42,7 +60,6 @@ class ReimbursementController extends Controller
             'jenis' => $request->jenis,
             'deskripsi' => $request->deskripsi,
             'nominal' => $nominal,
-            'tanggal_transfer' => $request->tgl_transfer,
             'status' => 'requested',
             'file_employee' => $input['file']
         ]);
@@ -64,11 +81,16 @@ class ReimbursementController extends Controller
             'jenis' => $request->jenis,
             'deskripsi' => $request->deskripsi,
             'nominal' => $nominal,
-            'tanggal_transfer' => $request->tgl_transfer,
             'status' => 'requested',
         ]);
 
-        $request->session()->flash('success','Berhasil Mengupdate Reimbursement');
+        $request->session()->flash('success', 'Berhasil Mengupdate Reimbursement');
         return redirect()->back();
+    }
+    public function export_excel(Request $request)
+    {
+        $bulan = Carbon::now()->isoFormat('MMMM');
+        $minggu = $request->minggu;
+        return Excel::download(new SheetReimbursement($minggu), "Report Reimbursement Minggu ke-$request->minggu bulan $bulan.xlsx");
     }
 }

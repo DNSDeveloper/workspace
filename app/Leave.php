@@ -14,7 +14,8 @@ class Leave extends Model
         'half_day',
         'start_date',
         'end_date',
-        'decline_reason'
+        'decline_reason',
+        'file'
     ];
     protected $dates = ['created_at', 'updated_at', 'start_date', 'end_date'];
     public function employee()

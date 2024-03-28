@@ -9,6 +9,7 @@ use App\Subtask;
 use App\Task;
 use App\Unit;
 use App\User;
+use GuzzleHttp\Client;
 use Str;
 use Illuminate\Http\Request;
 
@@ -66,6 +67,19 @@ class TaskController extends Controller
             'service_id'=> $request->service,
             'status'=> 'open'
         ]);
+        
+        $phone = $employee->phone;
+        $name = str_replace(' ', "%20", $employee->first_name . ' ' . $employee->last_name);
+        $service = "M002";
+        $taskId = $task->id;
+        $taskName = str_replace(" ", "%20", $request->task);
+        $taskCreator = str_replace(" ", "%20", $user->name);
+
+        
+        $client = new Client();
+        $url = env("API_URL")  . $phone . '?' . 'name=' . $name . '&service=' . $service . '&taskId=' . $taskId . '&task=' . $taskName . '&taskCreator=' . $taskCreator;
+        $storeToBot = $client->post($url);
+
         if ($task) {
             $request->session()->flash('success', "Task Berhasil ditambahkan ke $employee->first_name");
         } else {
@@ -81,6 +95,17 @@ class TaskController extends Controller
            'status'=> 'cancel',
            'note'=> $request->note, 
         ]);
+        $phone = $task->employee->phone;
+        $name = str_replace(' ', "%20", $task->employee->first_name . ' '. $task->employee->last_name);
+        $service = "M007";
+        $taskId = $task->id;
+        $taskName = str_replace(" ", "%20", $task->task);
+        $taskCreator = str_replace(" ", "%20", $task->user->name);
+        
+        $client = new Client();
+        $url = env("API_URL")  . $phone . '?' . 'name=' . $name . '&service=' . $service . '&taskId=' . $taskId . '&task=' . $taskName . '&taskCreator=' . $taskCreator;
+        $storeToBot = $client->post($url);
+        
         $request->session()->flash('success', "Task Berhasil Di Cancel");
 
         return redirect()->back();
@@ -92,6 +117,19 @@ class TaskController extends Controller
             'is_approved'=> 1,
             'status'=> 'confirmed'
         ]);
+
+        $phone = $task->employee->phone;
+        $name = str_replace(' ', "%20", $task->employee->first_name . ' '. $task->employee->last_name);
+        $service = "M008";
+        $taskId = $task->id;
+        $taskName = str_replace(" ", "%20", $task->task);
+        $taskCreator = str_replace(" ", "%20", $task->user->name);
+        $deadline = $task->deadline;
+        
+        $client = new Client();
+        $url = env("API_URL")  . $phone . '?' . 'name=' . $name . '&service=' . $service . '&taskId=' . $taskId . '&task=' . $taskName . '&taskCreator=' . $taskCreator.'&deadlineDate='.$deadline;
+        $storeToBot = $client->post($url);
+        
         return redirect()->route('admin.task.index')->with('success','Task Berhasil di Approved');
     }
 }

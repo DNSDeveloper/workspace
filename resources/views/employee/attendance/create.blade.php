@@ -48,7 +48,7 @@
     
                             <!-- form start -->
                             @if (!$attendance)
-                            <form role="form" method="post" action="{{ route('employee.attendance.store', $employee->id) }}" enctype="multipart/form-data">
+                            <form id="form-attendance" role="form" method="post" action="{{ route('employee.attendance.store', $employee->id) }}" enctype="multipart/form-data">
                             @else
                             <form role="form" method="post" action="{{ route('employee.attendance.update', $attendance->id) }}" >
                                 @method('PUT')
@@ -280,7 +280,7 @@
                                                 <input type="text"id="lat"  name="lat" >
                                                 <input type="text"id="long" name="long" >
                                                 <div class="col-md-12 text-center">
-                                                    <button id="submit" hidden class="btn btn-success mt-3">Submit</button>
+                                                    <button id="submit-masuk" type="submit" onclick="" hidden class="btn btn-success mt-3">Submit</button>
                                                 </div>
                                             </div>
                                             </div>
@@ -406,9 +406,14 @@
             Webcam.snap( function(data_uri) {
                 $(".image-tag").val(data_uri);
                 document.getElementById('results').innerHTML = '<img style="width:100%" src="'+data_uri+'"/>';
-                document.getElementById('submit').removeAttribute('hidden')
+                document.getElementById('submit-masuk').removeAttribute('hidden')
             } );
         }
+
+        $("#form-attendance").submit(function () {
+            $("#submit-masuk").attr("disabled", true);
+            console.log('click')
+        });
     }
 
     </script>

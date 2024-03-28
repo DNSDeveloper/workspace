@@ -7,9 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class Employee extends Model
 {
     protected $dates = ['created_at', 'dob','updated_at', 'join_date'];
-    protected $fillable = ['user_id', 'first_name', 'last_name', 'sex', 'dob', 'join_date', 'position_id', 'department_id', 'salary', 'photo'];
+    protected $fillable = ['user_id', 'first_name', 'last_name', 'sex', 'dob', 'join_date', 'position_id', 'department_id', 'salary', 'photo','phone','hak_cuti'];
     public function user() {
         return $this->belongsTo('App\User');
+    }
+
+    public function tasks() {
+        return $this->hasMany('App\Task');
     }
 
     public function position() {

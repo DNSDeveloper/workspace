@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use phpDocumentor\Reflection\Location;
 use Intervention\Image\Facades\Image;
@@ -128,60 +129,6 @@ class AttendanceController extends Controller
         
         $file = $folderPath . $fileName;
         file_put_contents(public_path().'/img_present/'.$fileName,$image_base64);
-        // Image::make($request->file('photo'))->resize(115, 115)->save('uploads/' . $nama_gambar);
-
-        // if ($photo) {
-        //     $nama_gambar = 'sangcahayaid-' . time() . $photo->getClientOriginalName();
-        //     $data['photo'] = 'uploads/' . $nama_gambar;
-        // }
-
-        // Storage::disk('public')->put($file , $image_base64);
-
-        $attendance = new Attendance([
-            'employee_id' => $employee_id,
-            'entry_ip' => $request->ip(),
-            'time' => date('h'),
-            'entry_location' => $request->entry_location,
-            'jam_masuk'=> date('H:i'),
-            'img_present'=> $file,
-            'status'=>date('H:i') > '09:30' ? 'terlambat' : 'hadir'
-        ]);
-        // $selectedSeats = Attendance::whereDate('created_at', Carbon::now())
-        //     ->pluck('no_kursi')
-        //     ->toArray(); 
-
-        // $kel1 = [1, 2, 3, 4, 5];
-        // $kel2 = [6, 7];
-        // $kel3 = [9, 10];
-
-        // // 1 3 2 
-        // // 2 3 1
-        // // 3 2 1
-        // if (empty($selectedSeats)) {
-        //     $availableSeats = array_diff(range(1, 10), $selectedSeats);
-        // } else {
-        //     switch ($selectedSeats[0]) {
-        //         case in_array(end($selectedSeats), [1, 2, 3, 4, 5]):
-        //             $availableSeats = array_diff($kel3, $selectedSeats);
-        //             break;
-        //         case in_array(end($selectedSeats), [6, 7]):
-        //             $availableSeats = array_diff($kel1, $selectedSeats);
-        //             break;
-        //         case in_array(end($selectedSeats), [9, 10]):
-        //             $availableSeats = array_diff($kel2, $selectedSeats);
-        //             break;
-        //         default:
-        //             $availableSeats = array_diff(range(1, 10), $selectedSeats);
-        //             break;
-        //     }
-        // }
-
-        // if (empty($availableSeats)) {
-        //     $availableSeats = array_diff(range(1, 10), $selectedSeats);
-        // }
-
-        // $randomSeat = array_rand($availableSeats);
-        // $attendance->no_kursi = $availableSeats[$randomSeat];
 
         $selectedSeats = Attendance::whereDate('created_at',Carbon::now())
         ->pluck('no_kursi')
@@ -191,61 +138,83 @@ class AttendanceController extends Controller
         $kel2 = [6,7];
         $kel3 = [9,10];
 
-        // 1 3 2 
-        // 2 1 3
-        // 3 1 2
-        $except = 8;
-        if($selectedSeats == []) {
-            $availableSeats = array_diff(range(1,10), [$except], $selectedSeats);
+        $except = [1,2,8];
+        $no_kursi = '';
+        if(empty($selectedSeats)) {
+            $availableSeats = array_diff(range(1,10), $except, $selectedSeats);
             $randomSeat = array_rand($availableSeats);
-            $attendance->no_kursi = $availableSeats[$randomSeat];
+            if($employee_id == "6") {
+                $no_kursi = 1;
+            } else if ($employee_id == "5") {
+                $no_kursi = 2;   
+            }else {
+                $no_kursi = $availableSeats[$randomSeat];
+            }
+            Log::info('kondisi 1 '. $no_kursi);
         } else {
             if(in_array($selectedSeats[0],$kel1)) {
                 if(end($selectedSeats)>= 9) {
                     $availableSeats = array_diff($kel2, $selectedSeats);
                 } else if((end($selectedSeats) == 6 ) || (end($selectedSeats) == 7) ) {
-                    $availableSeats = array_diff($kel1, $selectedSeats);
+                    $availableSeats = array_diff($kel1, $except, $selectedSeats);
                 } else{
                     $availableSeats = array_diff($kel3, $selectedSeats);
                 };
             } else if(in_array($selectedSeats[0],$kel2)) {
                 if(end($selectedSeats)>= 9) {
                     $availableSeats = array_diff($kel2, $selectedSeats);
-                } else if((end($selectedSeats) >= 1) && (end($selectedSeats) <= 5) ) {
+                } else if((end($selectedSeats) >= 3) && (end($selectedSeats) <= 5) ) {
                     $availableSeats = array_diff($kel3, $selectedSeats);
                 } else{
-                    $availableSeats = array_diff($kel1, $selectedSeats);
+                    $availableSeats = array_diff($kel1, $except,$selectedSeats);
                 };
             }  else if(in_array($selectedSeats[0],$kel3)) {
                 if((end($selectedSeats) == 6) || (end($selectedSeats) == 7)) {
                     $availableSeats = array_diff($kel3, $selectedSeats);
-                } else if((end($selectedSeats) >= 1) && (end($selectedSeats) <= 5) ) {
+                } else if((end($selectedSeats) >= 3) && (end($selectedSeats) <= 5) ) {
                     $availableSeats = array_diff($kel2, $selectedSeats);
                 } else{
-                    $availableSeats = array_diff($kel1, $selectedSeats);
+                    $availableSeats = array_diff($kel1, $except, $selectedSeats);
                 };
             } 
-            if($availableSeats == []) {
-                $availableSeats = array_diff(range(1,10),[$except], $selectedSeats);
+            if(empty($availableSeats)) {
+                $availableSeats = array_diff(range(1,10),$except, $selectedSeats);
                 $randomSeat = array_rand($availableSeats);
-                $attendance->no_kursi = $availableSeats[$randomSeat];
+                if($employee_id == "6") {
+                    $no_kursi = 1;
+                } else if ($employee_id == "5") {
+                    $no_kursi = 2;   
+                } else {
+                    $no_kursi = $availableSeats[$randomSeat];
+                }
+                Log::info('kondisi 2 '. $no_kursi);
             }
             $randomSeat = array_rand($availableSeats);
-            $attendance->no_kursi = $availableSeats[$randomSeat];
+            if($employee_id == "6") {
+                $no_kursi = 1;
+            } else if ($employee_id == "5") {
+                $no_kursi = 2;   
+            }else {
+                $no_kursi = $availableSeats[$randomSeat];
+            }
+            Log::info('kondisi 3 '. $no_kursi);
         }
-
-        // $exceptionKursi = 8;
-        // $availableSeats = array_diff(range(1, 10), [$exceptionKursi], $selectedSeats);
-        // // dd($availableSeats);
-        // if (!empty($availableSeats)) {
-        //     $randomSeat = array_rand($availableSeats);
-        //     $attendance->no_kursi = $availableSeats[$randomSeat];
-        // }
-        $attendance->save();
+        
+        $attendance = Attendance::create([
+            'employee_id' => $employee_id,
+            'entry_ip' => $request->ip(),
+            'time' => date('h'),
+            'entry_location' => $request->entry_location,
+            'jam_masuk'=> date('H:i'),
+            'img_present'=> $file,
+            'no_kursi'=> $no_kursi,
+            'status'=>date('H:i') > '09:00' ? 'terlambat' : 'hadir'
+        ]);
+        
         if(date('H:i')<='09:30') {
-         $request->session()->flash('success', "Keren! Kamu Datang Tepat Waktu 🤩, Silahkan duduk di kursi $availableSeats[$randomSeat]");
+         $request->session()->flash('success', "Keren! Kamu Datang Tepat Waktu 🤩, Silahkan duduk di kursi $attendance->no_kursi");
          } else {
-            $request->session()->flash('success', "Opps Kamu Terlambat 🥲, Silahkan duduk di kursi $availableSeats[$randomSeat]");
+            $request->session()->flash('success', "Opps Kamu Terlambat 🥲, Silahkan duduk di kursi $attendance->no_kursi");
          }
         return redirect()->route('employee.attendance.create')->with('employee', Auth::user()->employee)->with('masuk','Selamat Bekerja');
     }

@@ -5,8 +5,10 @@
   <div class="container-fluid pt-3">
     <div class="row">
       <div class="col-lg-4">
-        <h4>Today Attendance</h4>
         <div class="card">
+          <div class="card-header bg-primary">
+            Presensi Hari Ini
+          </div>
           @if ($attendance != null)
           <img class="card-img-top" src="{{ asset($attendance->img_present) }}" alt="Card image cap">
           <div class="card-body">
@@ -39,7 +41,8 @@
                 </td>
                 <td>:</td>
                 <td>
-                  <span class="badge badge-{{ $attendance->status =='terlambat' ? 'warning' : ($attendance->status =='hadir' ? 'success' : 'danger')}}">
+                  <span
+                    class="badge badge-{{ $attendance->status =='terlambat' ? 'warning' : ($attendance->status =='hadir' ? 'success' : 'danger')}}">
                     {{ ucwords($attendance->status) }}
                   </span>
                 </td>
@@ -60,7 +63,9 @@
                 Opps Kamu Belum Absen Hari Ini 😭
               </div>
               <div class="row mt-3">
-                <a href="{{ route('employee.attendance.create') }}" class="btn btn-primary btn-lg btn-block text-decoration-none "> Absen Dulu Yuk <i class="fa fa-arrow-right"></i></a>
+                <a href="{{ route('employee.attendance.create') }}"
+                  class="btn btn-primary btn-lg btn-block text-decoration-none "> Absen Dulu Yuk <i
+                    class="fa fa-arrow-right"></i></a>
               </div>
             </div>
           </div>
@@ -68,8 +73,10 @@
         </div>
       </div>
       <div class="col-lg-8">
-        <h4>Your Task</h4>
         <div class="card">
+          <div class="card-header bg-primary">
+            Task
+          </div>
           <div class="card-body">
             <table class="table">
               <thead>
@@ -88,7 +95,8 @@
                   <td>{{ $task->task }}</td>
                   <td>{{ $task->deadline }}</td>
                   <td>
-                    <span class="badge badge-{{ $task->status == 'open' ? 'primary' : 'warning' }}">{{ ucwords($task->status)
+                    <span class="badge badge-{{ $task->status == 'open' ? 'primary' : 'warning' }}">{{
+                      ucwords($task->status)
                       }}</span>
                   </td>
                   <td>
@@ -100,23 +108,70 @@
                 </tr>
                 @endforeach
                 @foreach ($subtask as $sub)
-                    <tr>
-                      <td>{{ $sub->task->employee->first_name }}</td>
-                      <td>{{ $sub->task->task }}</td>
-                      <td>{{ $sub->deadline }}</td>
-                      <td> <span class="badge badge-{{ $sub->status == 'open' ? 'primary' : 'warning' }}">{{ ucwords($sub->status)
+                <tr>
+                  <td>{{ $sub->task->employee->first_name }}</td>
+                  <td>{{ $sub->task->task }}</td>
+                  <td>{{ $sub->deadline }}</td>
+                  <td> <span class="badge badge-{{ $sub->status == 'open' ? 'primary' : 'warning' }}">{{
+                      ucwords($sub->status)
                       }}</span></td>
-                      <td><a class="btn btn-warning" href="{{ route('employee.task') }}">
-                      <i class="fas fa-eye"></i>  
-                      </a></td>
-                    </tr>
+                  <td><a class="btn btn-warning" href="{{ route('employee.task') }}">
+                      <i class="fas fa-eye"></i>
+                    </a></td>
+                </tr>
                 @endforeach
               </tbody>
             </table>
           </div>
         </div>
       </div>
-      
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-primary">
+            Uang Harian
+          </div>
+          <div class="card-body">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Nama Employee</th>
+                  <th>Total Per Bulan</th>
+                  <th colspan="5">Total Per Minggu</th> <!-- Menggunakan colspan untuk menggabungkan 5 kolom -->
+                </tr>
+              </thead>
+              <tbody>
+                @foreach($uangHarians as $employee)
+                <tr>
+                  <td>{{ $employee['nama_employee'] }}</td>
+                  <td>@currency($employee['total_permonth'])</td>
+                  <td colspan="5">
+                    <!-- Menggunakan colspan untuk menggabungkan 5 kolom -->
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          @foreach($employee['detail'] as $detail)
+                          <td>{{ $detail['week'] }}</td>
+                          @endforeach
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          @foreach($employee['detail'] as $detail)
+                          <td>@currency($detail['total'])</td>
+                          @endforeach
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>

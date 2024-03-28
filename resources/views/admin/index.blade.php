@@ -41,6 +41,7 @@
                         <th>Employee</th>
                         @for ($q = 1; $q <= $days; $q++) <th>{{ $q }}</th>
                             @endfor
+                            <th style="width: 200px;">Saldo Uang Harian</th>
                     </thead>
                     <tbody>
                         @if($attendances->count() >= 1)
@@ -72,6 +73,10 @@
                                     @endif
                                     </td>
                                     @endfor
+                                    <td>
+                                        @currency(count($attendances->whereNotIn('employee_id',$tes[0]->employee_id)->whereIn('status',['terlambat','hadir']))
+                                        * 25 . '000')
+                                    </td>
                         </tr>
                         @endforeach
                         @else
@@ -123,21 +128,6 @@
                     <div class="modal fade" id="exampleModal{{ $todayAttendance->id }}" tabindex="-1" role="dialog"
                         aria-labelledby="exampleModalLabel" aria-hidden="true">
                         <div class="modal-dialog" role="document">
-                            {{-- <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    ...
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                    <button type="button" class="btn btn-primary">Save changes</button>
-                                </div>
-                            </div> --}}
                             <img src="{{ asset($todayAttendance->img_present) }}" alt="">
                         </div>
                     </div>

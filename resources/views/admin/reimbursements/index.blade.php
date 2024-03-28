@@ -31,6 +31,22 @@
                         <h3 class="card-title">Data Reimbursement</h3>
                     </div>
                     <div class="card-body">
+                        <div class="mb-3">
+                            <form class="d-flex mr-2" method="GET" action="{{ route('admin.reimbursements.export')}}">
+                                <div class="mr-2">
+                                    <select name="minggu" id="" class="form-control">
+                                        <option value="">Minggu Ke- </option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-success"> <i class="fa fa-file-excel"></i> Export
+                                    Excel</button>
+                            </form>
+                        </div>
                         <table class="table table-hover" id="dataTable">
                             <thead>
                                 <tr>
@@ -63,7 +79,8 @@
                                             </tr>
                                             <tr>
                                                 <td> Tgl Transfer</td>
-                                                <td> {{ date('d M Y',strtotime($reimbursement->tanggal_transfer)) }}
+                                                <td> {{ $reimbursement->tanggal_transfer != null ? date('d M
+                                                    Y',strtotime($reimbursement->tanggal_transfer) ) : '-' }}
                                                 </td>
                                             </tr>
                                             <tr>
@@ -78,7 +95,8 @@
                                                 <td>Employee</td>
                                                 <td>
                                                     @if($reimbursement->file_employee != null)
-                                                    <a target="_blank" href="{{ asset('/reimbursement/'. $reimbursement->file_employee) }}">
+                                                    <a target="_blank"
+                                                        href="{{ asset('/reimbursement/'. $reimbursement->file_employee) }}">
                                                         Click Here
                                                     </a>
                                                     @else
@@ -90,7 +108,8 @@
                                                 <td>Admin</td>
                                                 <td>
                                                     @if($reimbursement->file_admin != null)
-                                                    <a target="_blank" href="{{ asset('/reimbursement/'. $reimbursement->file_admin) }}">
+                                                    <a target="_blank"
+                                                        href="{{ asset('/reimbursement/'. $reimbursement->file_admin) }}">
                                                         Click Here
                                                     </a>
                                                     @else
@@ -156,6 +175,12 @@
                                                                 id="file-{{ $reimbursement->id }}" class="mb-3">
                                                                 <label for="">File</label>
                                                                 <input type="file" class="form-control" name="file">
+                                                            </div>
+                                                            <div class="mb-3" style="display: none"
+                                                                id="tgl-{{ $reimbursement->id }}">
+                                                                <label for="">Tanggal Transfer</label>
+                                                                <input type="date" class="form-control"
+                                                                    name="tgl_transfer" required>
                                                             </div>
                                                         </div>
                                                         <div class="modal-footer">
@@ -226,11 +251,13 @@ function changeStatus(selectElement) {
         var statusSelect = selectElement;
         var catetan = document.getElementById('catetan-' + reimburse);
         var file = document.getElementById('file-' + reimburse);
+        var tgl = document.getElementById('tgl-' + reimburse);
         catetan.style.display = 'none';
         file.style.display = 'none';
         if (statusSelect.value != 'pending') {
             catetan.style.display = 'none';
             file.style.display = 'block';
+            tgl.style.display = 'block';
         } else {
             catetan.style.display = 'block';
         }

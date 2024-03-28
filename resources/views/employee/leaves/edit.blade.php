@@ -40,7 +40,7 @@
                             </h3>
                         </div>
                         @include('messages.alerts')
-                        <form action="{{ route('employee.leaves.update', $leave->id) }}" method="POST">
+                        <form action="{{ route('employee.leaves.update', $leave->id) }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
                             <div class="card-body">
@@ -86,6 +86,12 @@
                                         </div>
                                         @enderror
                                     </div>
+                                    @if($leave->reason == 'Sakit' && $leave->end_date != null)
+                                    <div class="form-group" id="file">
+                                        <label for="">File</label>
+                                        <input type="file" name="file" class="form-control">
+                                    </div>
+                                    @endif
                                     <div class="form-group hide-input" id="date-group">
                                         <label for="">Seleksi Tanggal </label>
                                         <input type="text" name="date" id="date" class="form-control">
@@ -183,6 +189,7 @@
         $('#range-group').toggleClass('hide-input');
         $('#date-group').toggleClass('hide-input');
         $('#half-day').toggleClass('hide-input');
+        $('#file').toggleClass('hide-input');
     }
 </script>
 @endsection

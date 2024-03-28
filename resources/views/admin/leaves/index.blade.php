@@ -1,159 +1,163 @@
-@extends('layouts.app')        
+@extends('layouts.app')
 
 @section('content')
-    <div class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1 class="m-0 text-dark">Daftar Cuti Karyawan</h1>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item">
-                            <a href="{{ route('admin.index') }}">Dashboard Admin</a>
-                        </li>
-                        <li class="breadcrumb-item active">
-                            Daftar Cuti Karyawan
-                        </li>
-                    </ol>
-                </div>
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark">Daftar Cuti Karyawan</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item">
+                        <a href="{{ route('admin.index') }}">Dashboard Admin</a>
+                    </li>
+                    <li class="breadcrumb-item active">
+                        Daftar Cuti Karyawan
+                    </li>
+                </ol>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Main content -->
-    <section class="content">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-lg-12">
-                    <!-- general form elements -->
-                    @include('messages.alerts')
-                    @error('status')
-                        <div class="alert alert-danger">
-                            Pilih Opsi Valid
-                        </div>
-                    @enderror
-                    <div class="card card-primary">
-                        <div class="card-header">
-                            <h3 class="card-title">Daftar Cuti</h3>
-                        </div>
-                        <div class="card-body">
-                            <table class="table table-hover" id="dataTable">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Tanggal Pengajuan</th>
-                                        <th>Nama</th>
-                                        <th>Department</th>
-                                        <th>Jabatan</th>
-                                        <th>Alasan</th>
-                                        <th>Status</th>
-                                        <th class="none">Setengah Jam Kerja</th>
-                                        <th class="none">Tanggal Awal</th>
-                                        <th class="none">Tanggal Akhir</th>
-                                        <th class="none">Deskripsi</th>
-                                        <td class="none">Aksi</td>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($leaves as $index => $leave)
-                                    <tr>
-                                        <td>{{ $index + 1 }}</td>
-                                        <td>{{ $leave->created_at->format('d-m-Y') }}</td>
-                                        <td>{{ $leave->employee->first_name.' '.$leave->employee->last_name }}</td>
-                                        <td>{{ $leave->employee->department }}</td>
-                                        <td>{{ $leave->employee->desg }}</td>
-                                        <td>{{ $leave->reason }}</td>
-                                        <td>
-                                            <h5>
-                                                <span 
-                                                @if ($leave->status == 'pending')
-                                                    class="badge badge-pill badge-warning"
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <!-- general form elements -->
+                @include('messages.alerts')
+                @error('status')
+                <div class="alert alert-danger">
+                    Pilih Opsi Valid
+                </div>
+                @enderror
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Daftar Cuti</h3>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-hover" id="dataTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Nama</th>
+                                    <th>Tanggal Pengajuan</th>
+                                    <th>Alasan</th>
+                                    <th>Status</th>
+                                    <th class="none">Setengah Jam Kerja</th>
+                                    <th class="none">Tanggal Awal</th>
+                                    <th class="none">Tanggal Akhir</th>
+                                    <th class="none">Deskripsi</th>
+                                    <th class="none">Attach</th>
+                                    <td class="none">Aksi</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($leaves as $index => $leave)
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ $leave->employee->first_name.' '.$leave->employee->last_name }}</td>
+                                    <td>{{ $leave->created_at->format('d-m-Y') }}</td>
+                                    <td>{{ $leave->reason }}</td>
+                                    <td>
+                                        <h5>
+                                            <span @if ($leave->status == 'pending')
+                                                class="badge badge-pill badge-warning"
                                                 @elseif($leave->status == 'declined')
-                                                    class="badge badge-pill badge-danger"
+                                                class="badge badge-pill badge-danger"
                                                 @elseif($leave->status == 'approved')
-                                                    class="badge badge-pill badge-success"
+                                                class="badge badge-pill badge-success"
                                                 @endif
                                                 >
-                                                    {{ ucfirst($leave->status) }}
-                                                </span> 
-                                            </h5>
-                                        </td>
-                                        <td>{{ ucfirst($leave->half_day) }}</td>
-                                        <td>{{ $leave->start_date->format('d-m-Y')}}</td>
-                                        @if($leave->end_date) 
-                                        <td>{{ $leave->end_date->format('d-m-Y') }}</td>
+                                                {{ ucfirst($leave->status) }}
+                                            </span>
+                                        </h5>
+                                    </td>
+                                    <td>{{ ucfirst($leave->half_day) }}</td>
+                                    <td>{{ $leave->start_date->format('d-m-Y')}}</td>
+                                    @if($leave->end_date)
+                                    <td>{{ $leave->end_date->format('d-m-Y') }}</td>
+                                    @else
+                                    <td>Sehari</td>
+                                    @endif
+                                    <td>{{ $leave->description }}</td>
+                                    <td>
+                                        @if ($leave->file != null)
+                                        <a target="_blank" href="{{ url('/cuti/'.$leave->file) }}">Click Here</a>
                                         @else
-                                        <td>Sehari</td>
+                                        -
                                         @endif
-                                        <td>{{ $leave->description }}</td>
-                                        <td>
-                                            <button 
-                                            class="btn btn-flat btn-info"
-                                            data-toggle="modal"
-                                            data-target="#deleteModalCenter{{ $index + 1 }}"
-                                            >
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-flat btn-info" data-toggle="modal"
+                                            data-target="#deleteModalCenter{{ $index + 1 }}">
                                             Ubah Status
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                            @for ($i = 1; $i < $leaves->count()+1; $i++)
-                                <!-- Modal -->
-                                <div class="modal fade" id="deleteModalCenter{{ $i }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalCenterTitle1{{ $i }}" aria-hidden="true">
-                                    <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
-                                        <div class="modal-content">
-                                            <div class="card card-info">
-                                                <div class="card-header">
-                                                    <h5 style="text-align: center !important">Ubah Status Cuti</h5>
-                                                </div>
-                                                <form 
-                                                    action="{{ route('admin.leaves.update', $leaves->get($i-1)->id) }}"
-                                                    method="POST"
-                                                >
+                                        </button>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                        @for ($i = 1; $i < $leaves->count()+1; $i++)
+                            <!-- Modal -->
+                            <div class="modal fade" id="deleteModalCenter{{ $i }}" tabindex="-1" role="dialog"
+                                aria-labelledby="deleteModalCenterTitle1{{ $i }}" aria-hidden="true">
+                                <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="card card-info">
+                                            <div class="card-header">
+                                                <h5 style="text-align: center !important">Ubah Status Cuti</h5>
+                                            </div>
+                                            <form action="{{ route('admin.leaves.update', $leaves->get($i-1)->id) }}"
+                                                method="POST">
                                                 <div class="card-body">
                                                     @csrf
                                                     @method('PUT')
-                                                        <div class="form-group text-center">
-                                                            <label for="">Pilih Status</label>
-                                                            <select id="status" name="status" class="form-control text-center mx-auto" style="width:50%" onchange="toggleStatusCuti(this)">
-                                                                <option hidden disabled selected value> ---- </option>
-                                                                <option value="pending">Pending</option>
-                                                                <option value="approved">Diterima</option>
-                                                                <option value="declined">Ditolak</option>
-                                                            </select>
-                                                        </div>
-                                                        <div style="display: none" id="leaves-{{ $leaves->get($i-1)->id }}" class="form-group">
-                                                            <textarea class="form-control" name="decline_reason" id="decline_reason" cols="30" rows="3" placeholder="Reason"></textarea>
-                                                        </div>
+                                                    <div class="form-group text-center">
+                                                        <label for="">Pilih Status</label>
+                                                        <select id="status" name="status"
+                                                            class="form-control text-center mx-auto" style="width:50%"
+                                                            onchange="toggleStatusCuti(this)">
+                                                            <option hidden disabled selected value> ---- </option>
+                                                            <option value="pending">Pending</option>
+                                                            <option value="approved">Diterima</option>
+                                                            <option value="declined">Ditolak</option>
+                                                        </select>
+                                                    </div>
+                                                    <div style="display: none" id="leaves-{{ $leaves->get($i-1)->id }}"
+                                                        class="form-group">
+                                                        <textarea class="form-control" name="decline_reason"
+                                                            id="decline_reason" cols="30" rows="3"
+                                                            placeholder="Reason"></textarea>
+                                                    </div>
                                                 </div>
                                                 <div class="card-footer text-center">
                                                     <button type="submit" class="btn flat btn-info">Update</button>
                                                 </div>
                                             </form>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <!-- /.modal -->
+                            </div>
+                            <!-- /.modal -->
                             @endfor
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- /.container-fluid -->
-    </section>
-    <!-- /.content -->
+    </div>
+    <!-- /.container-fluid -->
+</section>
+<!-- /.content -->
 
 @endsection
 
 @section('extra-js')
 
 <script>
-$(document).ready(function(){
+    $(document).ready(function(){
     $('[data-toggle="popover"]').popover();
     $('.popover-dismiss').popover({
         trigger: 'focus'

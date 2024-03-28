@@ -81,7 +81,7 @@
                                         <table class="table {{ $unit->name }} table-bordered table-hover" id="">
                                             <thead>
                                                 <tr>
-                                                    <th scope="col">#</th>
+                                                    <th scope="col">TaskID</th>
                                                     <th scope="col">From</th>
                                                     <th scope="col">To</th>
                                                     <th scope="col">Service</th>
@@ -97,7 +97,7 @@
                                                 $task)
                                                 <tr style="background-color:  {{ ($task->status == 'open' || $task->status == 'on progress' || $task->status == 'confirmed') 
                                                     && $task->deadline < today() ? 'antiquewhite' : 'white'}} ">
-                                                    <th>{{ $loop->iteration }}</th>
+                                                    <th>{{ 'TASK' . str_pad($task->id, 7, '0', STR_PAD_LEFT) }}</th>
                                                     <td>{{ $task->user->name}}</td>
                                                     <td>{{ $task->employee->first_name}}</td>
                                                     <td>{{ isset($task->service) ? $task->service->name : '-' }}</td>

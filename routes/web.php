@@ -84,7 +84,10 @@ Route::namespace('Admin')->prefix('admin')->name('admin.')->middleware(['auth', 
     Route::get('/reimbursements', 'ReimbursementController@index')->name('reimbursements.index');
     // Route::post('/reimbursements/store', 'PositionController@store')->name('reimbursements.store');
     Route::post('/reimbursements/update/{id}', 'ReimbursementController@update')->name('reimbursements.update');
-    // Routes for holidays //
+    Route::get('/reimbursements/export-excel/', 'ReimbursementController@export_excel')->name('reimbursements.export');
+
+    Route::get('/bkinerja', 'BonusKinerjaController@index')->name('bkinerja.index');
+    Route::get('/bkinerja/detail/{employee_id}', 'BonusKinerjaController@detail')->name('bkinerja.detail');
 });
 
 Route::namespace('Employee')->prefix('employee')->name('employee.')->middleware(['auth', 'can:employee-access'])->group(function () {
@@ -142,5 +145,5 @@ Route::namespace('Employee')->prefix('employee')->name('employee.')->middleware(
     Route::get('/reimbursements', 'ReimbursementController@index')->name('reimbursements.index');
     Route::post('/reimbursements/store', 'ReimbursementController@store')->name('reimbursements.store');
     Route::post('/reimbursements/update/{id}', 'ReimbursementController@update')->name('reimbursements.update');
-
+    Route::get('/reimbursements/export-excel/', 'ReimbursementController@export_excel')->name('reimbursements.export');
 });

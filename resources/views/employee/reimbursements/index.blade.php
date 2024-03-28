@@ -41,7 +41,8 @@
                     </div>
                     <div class="mb-3">
                         <label for="">Minggu Ke-</label>
-                        <input type="number" name="minggu" placeholder="Minggu Ke-" class="form-control" required>
+                        <input type="number" readonly name="minggu" value="{{ $week }}" placeholder="Minggu Ke-"
+                            class="form-control" required>
                     </div>
                     <div class="mb-3">
                         <label for="">Jenis</label>
@@ -65,10 +66,10 @@
                             required>
                     </div>
 
-                    <div class="mb-3">
+                    {{-- <div class="mb-3">
                         <label for="">Tanggal Transfer</label>
                         <input type="date" class="form-control" name="tgl_transfer" required>
-                    </div>
+                    </div> --}}
 
                     <div class="mb-3">
                         <label for="">File</label>
@@ -93,6 +94,25 @@
                         <h3 class="card-title">Data Reimbursement</h3>
                     </div>
                     <div class="card-body">
+                        @if (auth()->user()->employee->id == 3)
+                        <div class="mb-3">
+                            <form class="d-flex mr-2" method="GET"
+                                action="{{ route('employee.reimbursements.export')}}">
+                                <div class="mr-2">
+                                    <select name="minggu" id="" class="form-control">
+                                        <option value="">Minggu Ke- </option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-success"> <i class="fa fa-file-excel"></i> Export
+                                    Excel</button>
+                            </form>
+                        </div>
+                        @endif
                         <div class="mb-3">
                             <button class="btn btn-primary" data-toggle="modal" data-target="#exampleModal"> <i
                                     class="fas fa-plus"></i> Add Reimbursement </button>
@@ -100,6 +120,9 @@
                         <table class="table table-hover" id="dataTable">
                             <thead>
                                 <tr>
+                                    @if (auth()->user()->employee->id == 3)
+                                    <th>Nama</th>
+                                    @endif
                                     <th>Jenis</th>
                                     <th>Deskripsi</th>
                                     <th>Minggu Ke-</th>
@@ -113,6 +136,10 @@
                             <tbody>
                                 @foreach ($reimbursements as $reimbursement)
                                 <tr>
+                                    @if (auth()->user()->employee->id == 3)
+                                    <td>{{ $reimbursement->employee->first_name . ' '.
+                                        $reimbursement->employee->last_name }}</td>
+                                    @endif
                                     <td>{{ ucfirst($reimbursement->jenis) }}</td>
                                     <td>{{ ucfirst($reimbursement->deskripsi) }}</td>
                                     <td>{{ $reimbursement->minggu }}</td>
@@ -126,7 +153,8 @@
                                             </tr>
                                             <tr>
                                                 <td> Tgl Transfer</td>
-                                                <td> {{ date('d M Y',strtotime($reimbursement->tanggal_transfer)) }}
+                                                <td> {{ $reimbursement->tanggal_transfer != null ? date('d M
+                                                    Y',strtotime($reimbursement->tanggal_transfer) ) : '-' }}
                                                 </td>
                                             </tr>
                                             <tr>
@@ -245,13 +273,6 @@
                                                                     type="text" placeholder="Nominal"
                                                                     class="form-control" name="nominal" required>
                                                             </div>
-                                                            <div class="mb-3">
-                                                                <label for="">Tanggal Transfer</label>
-                                                                <input
-                                                                    value="{{ date('Y-m-d',strtotime($reimbursement->tanggal_transfer))  }}"
-                                                                    type="date" class="form-control" name="tgl_transfer"
-                                                                    required>
-                                                            </div>
                                                         </div>
                                                         <div class="modal-footer">
                                                             <button type="button" class="btn btn-secondary"
@@ -265,7 +286,9 @@
                                         </div>
                                         @if($reimbursement->status !== 'paid')
                                         <button class="btn btn-success"
-                                            data-target="#updateReimburse{{ $reimbursement->id }}" data-toggle="modal">
+                                            data-target="#updateReimburse{{ $reimbursement->id }}" data-toggle="modal"
+                                            {{ auth()->user()->employee->id == 3 && (auth()->user()->employee->id !=
+                                            $reimbursement->employee->id) ? 'hidden' : '' }}>
                                             <i class="fas fa-edit">
                                             </i>
                                         </button>
