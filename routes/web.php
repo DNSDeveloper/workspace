@@ -146,4 +146,6 @@ Route::namespace('Employee')->prefix('employee')->name('employee.')->middleware(
     Route::post('/reimbursements/store', 'ReimbursementController@store')->name('reimbursements.store');
     Route::post('/reimbursements/update/{id}', 'ReimbursementController@update')->name('reimbursements.update');
     Route::get('/reimbursements/export-excel/', 'ReimbursementController@export_excel')->name('reimbursements.export');
+    Route::delete('/reimbursements/delete/{id}', 'ReimbursementController@destroy')->name('reimbursements.delete');
+
 });

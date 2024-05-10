@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Leave;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 
 class LeaveController extends Controller
@@ -33,6 +34,17 @@ class LeaveController extends Controller
         $leave->decline_reason = $request->decline_reason != null ? $request->decline_reason : null;
         $start = date('d',strtotime($leave->start_date));        
         $end = $leave->end_date == null ? null : date('d',strtotime($leave->end_date));
+        
+        $declineReason = preg_replace( "/\r|\n/", "",trim($request->decline_reason));
+        $client = new Client();
+        $headers = ['Content-Type' => 'application/json',];
+        $data = [
+            "name"=> $leave->employee->first_name . ' '. $leave->employee->last_name,
+            "status"=> ucfirst($request->status),
+            "reason"=> $request->status == 'declined'? "*karena $declineReason*"  : "",
+            "code"=> "C005"
+        ];
+        $url = env("API_URL"). 'call-service/'. $leave->employee->phone;
         if($leave->status == 'approved') {
             if($end == null) {
                 $attendance = Attendance::create([
@@ -57,9 +69,16 @@ class LeaveController extends Controller
                 }
             }
         }
+        try {
+            $client->post($url,[
+                "headers"=> $headers,
+                "json"=> $data
+            ]);
+        } catch (\Throwable $th) {
+            $leave->save();
+            return redirect()->back()->with('success', ' Status Cuti Berhasil Diubah');
+        }
         $leave->save();
-        $request->session()->flash('success', ' Status Cuti Berhasil Diubah');
-        
-        return back();
+        return redirect()->back()->with('success', ' Status Cuti Berhasil Diubah');
     }
 }

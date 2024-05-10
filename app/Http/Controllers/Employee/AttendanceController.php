@@ -214,7 +214,7 @@ class AttendanceController extends Controller
         if(date('H:i')<='09:30') {
          $request->session()->flash('success', "Keren! Kamu Datang Tepat Waktu 🤩, Silahkan duduk di kursi $attendance->no_kursi");
          } else {
-            $request->session()->flash('success', "Opps Kamu Terlambat 🥲, Silahkan duduk di kursi $attendance->no_kursi");
+            $request->session()->flash('error', "Opps Kamu Terlambat 🥲, Silahkan duduk di kursi $attendance->no_kursi");
          }
         return redirect()->route('employee.attendance.create')->with('employee', Auth::user()->employee)->with('masuk','Selamat Bekerja');
     }

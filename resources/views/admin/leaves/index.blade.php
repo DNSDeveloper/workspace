@@ -92,7 +92,7 @@
                                     </td>
                                     <td>
                                         <button class="btn btn-flat btn-info" data-toggle="modal"
-                                            data-target="#deleteModalCenter{{ $index + 1 }}">
+                                            data-target="#deleteModalCenter{{ $leave->id }}">
                                             Ubah Status
                                         </button>
                                     </td>
@@ -102,8 +102,8 @@
                         </table>
                         @for ($i = 1; $i < $leaves->count()+1; $i++)
                             <!-- Modal -->
-                            <div class="modal fade" id="deleteModalCenter{{ $i }}" tabindex="-1" role="dialog"
-                                aria-labelledby="deleteModalCenterTitle1{{ $i }}" aria-hidden="true">
+                            <div class="modal fade" id="deleteModalCenter{{ $leaves->get($i-1)->id }}" tabindex="-1"
+                                role="dialog" aria-labelledby="deleteModalCenterTitle1{{ $i }}" aria-hidden="true">
                                 <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
                                     <div class="modal-content">
                                         <div class="card card-info">
@@ -178,22 +178,19 @@
 </script>
 <script>
     function toggleStatusCuti(selectElement) {
-        var task = selectElement.closest('.modal').id.replace('deleteModalCenter', '');
-
-        // Dapatkan elemen select
-        var statusSelect = selectElement;
-        // Dapatkan elemen report-subtask
-        var reportTask = document.getElementById('leaves-' + task);
-        reportTask.style.display = 'none';
-
-        // Periksa nilai yang dipilih pada elemen select
+    var task = selectElement.closest('.modal').id.replace('deleteModalCenter', '');
+    console.log('Task ID:', task); // Mencetak nilai task untuk memeriksa apakah benar
+    var statusSelect = selectElement;
+    var reportTask = document.getElementById('leaves-' + task);
+    if (reportTask) { // Memeriksa apakah elemen ditemukan sebelum mencoba mengakses propertinya
         if (statusSelect.value != 'declined') {
-            // Jika nilai 'done', tampilkan report-subtask
             reportTask.style.display = 'none';
         } else {
-            // Jika nilai 'on progress' atau nilai lainnya, sembunyikan report-subtask
             reportTask.style.display = 'block';
         }
+    } else {
+        console.error("Element with ID 'leaves-" + task + "' not found."); // Cetak pesan kesalahan jika elemen tidak ditemukan
     }
+}
 </script>
 @endsection

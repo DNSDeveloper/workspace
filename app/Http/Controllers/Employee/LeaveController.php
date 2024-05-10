@@ -9,6 +9,7 @@ use App\Leave;
 use App\Rules\DateRange;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
@@ -107,27 +108,41 @@ class LeaveController extends Controller
                 'hak_cuti' => $hakCuti->hak_cuti - 1
             ]);
         }
-        if($hakCuti->hak_cuti < 1){
-            
+        if ($hakCuti->hak_cuti < 1) {
+            return redirect()->back()->with('error', 'Hak Cuti Anda sudah Habis');
         } else {
             Leave::create($values);
         }
-        $request->session()->flash('success', 'Pengajuan Cuti Anda berhasil, tunggu persetujuan atasan.');
-        return redirect()->route('employee.leaves.create')->with($data);
-        // }
+        try {
+            $client = new Client();
+            $headers = ["Content-Type" => "application/json"];
+            $dataBot = [
+                "name" => auth()->user()->employee->first_name . ' ' . auth()->user()->employee->last_name,
+                "reason" => ucfirst($request->reason) . ' - ' . $request->description,
+                "code" => "C001"
+            ];
+            $url = env("API_URL") . 'call-service/' . "6281387297959";
+            $client->post($url, [
+                "headers" => $headers,
+                "json" => $dataBot
+            ]);
+        } catch (\Throwable $th) {
+            return redirect()->route('employee.leaves.create')->with($data)->with('success', 'Pengajuan Cuti Anda berhasil, tunggu persetujuan atasan. Bot Notifikasi tidak Terkirim');
+        }
+        return redirect()->route('employee.leaves.create')->with($data)->with('success', 'Pengajuan Cuti Anda berhasil, tunggu persetujuan atasan.');
     }
 
     public function edit($leave_id)
     {
         $leave = Leave::findOrFail($leave_id);
-        Gate::authorize('employee-leaves-access', $leave);
+        // Gate::authorize('employee-leaves-access', $leave);
         return view('employee.leaves.edit')->with('leave', $leave);
     }
 
     public function update(Request $request, $leave_id)
     {
         $leave = Leave::findOrFail($leave_id);
-        Gate::authorize('employee-leaves-access', $leave);
+        // Gate::authorize('employee-leaves-access', $leave);
         if ($request->input('multiple-days') == 'yes') {
             $this->validate($request, [
                 'reason' => 'required',
@@ -168,15 +183,13 @@ class LeaveController extends Controller
         }
 
         $leave->save();
-
-        $request->session()->flash('success', 'Update Pengajuan Cuti Anda berhasil');
-        return redirect()->route('employee.leaves.index');
+        return redirect()->route('employee.leaves.index')->with('success', 'Update Pengajuan Cuti Anda berhasil');
     }
 
     public function destroy($leave_id)
     {
         $leave = Leave::findOrFail($leave_id);
-        Gate::authorize('employee-leaves-access', $leave);
+        // Gate::authorize('employee-leaves-access', $leave);
         $leave->delete();
         request()->session()->flash('success', 'Pengajuan Cuti Anda berhasil dihapus');
 

@@ -7,7 +7,9 @@ use App\Exports\SheetReimbursement;
 use App\Http\Controllers\Controller;
 use App\Reimbursement;
 use Carbon\Carbon;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Image;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -63,9 +65,25 @@ class ReimbursementController extends Controller
             'status' => 'requested',
             'file_employee' => $input['file']
         ]);
-        if ($reimbursements) {
-            $request->session()->flash('success', 'Berhasil Menambah Reimbursement');
-            return redirect()->back();
+        try {
+            $header = [
+                'Content-Type' => 'application/json',
+            ];
+            $data = [
+                "name" => auth()->user()->employee->first_name . ' ' . auth()->user()->employee->last_name,
+                "deskripsi" => preg_replace("/\r|\n/", "", $request->deskripsi),
+                "nominal" => $nominal,
+                'code' => "R001"
+            ];
+            $client = new Client();
+            $url = env("API_URL") . 'call-service/' . '6281387297959';
+            $storeToBot = $client->post($url, [
+                "headers" => $header,
+                "json" => $data
+            ]);
+            return redirect()->back()->with('success', 'Berhasil Menambah Reimbursement');
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('success', 'Berhasil Menambah Reimbursement, Bot Notifikasi tidak Terkirim');
         }
     }
 
@@ -92,5 +110,18 @@ class ReimbursementController extends Controller
         $bulan = Carbon::now()->isoFormat('MMMM');
         $minggu = $request->minggu;
         return Excel::download(new SheetReimbursement($minggu), "Report Reimbursement Minggu ke-$request->minggu bulan $bulan.xlsx");
+    }
+
+    public function destroy($id)
+    {
+        $reimbursement = Reimbursement::find($id);
+        if ($reimbursement->file_employee) {
+            $imagePath = public_path($reimbursement->file_employee);
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+        }
+        $reimbursement->delete();
+        return response()->json(['success' => 'Berhasil Menghapus Reimbursement']);
     }
 }

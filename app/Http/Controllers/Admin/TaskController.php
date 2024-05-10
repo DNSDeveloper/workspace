@@ -9,6 +9,7 @@ use App\Subtask;
 use App\Task;
 use App\Unit;
 use App\User;
+use Exception;
 use GuzzleHttp\Client;
 use Str;
 use Illuminate\Http\Request;
@@ -18,36 +19,38 @@ class TaskController extends Controller
     public function index()
     {
         $units = Unit::with('tasks')
-        ->get();
-        $employees= Employee::get();
-        $needConfirmed = Task::where('is_approved',0)->get();
+            ->get();
+        $employees = Employee::get();
+        $needConfirmed = Task::where('is_approved', 0)->get();
         $subtasks = Subtask::orderBy('created_at', 'desc')->get();
-        return view('admin.task.index', compact('units','employees','needConfirmed','subtasks'));
+        return view('admin.task.index', compact('units', 'employees', 'needConfirmed', 'subtasks'));
     }
 
     public function create()
     {
         $employees = Employee::get();
         $units = Unit::get();
-        
-        return view('admin.task.create', compact('employees','units'));
+
+        return view('admin.task.create', compact('employees', 'units'));
     }
 
-    public function fetchService(Request $request) {
-        $services = Service::where('unit_id',$request->unit_id)->get();
-        
+    public function fetchService(Request $request)
+    {
+        $services = Service::where('unit_id', $request->unit_id)->get();
+
         return response()->json($services);
     }
-    
+
     public function detail($id)
     {
-        $task = Task::with('subtasks')->where('id',$id)->first();
-        return view('admin.task.detail',compact('task'));
+        $task = Task::with('subtasks')->where('id', $id)->first();
+        return view('admin.task.detail', compact('task'));
     }
 
-    public function history() {
+    public function history()
+    {
         $units = Unit::with('tasks')
-        ->get();
+            ->get();
         return view('admin.task.history', compact('units'));
     }
 
@@ -60,76 +63,82 @@ class TaskController extends Controller
             'user_id' => $user->id,
             'task' => $request->task,
             'note' => $request->note,
-            'category'=> $request->category,
+            'category' => $request->category,
             'deadline' => date('Y-m-d H:i:s', strtotime($request->deadline)),
             'is_priority' => $request->is_priority,
             'unit_id' => $request->unit,
-            'service_id'=> $request->service,
-            'status'=> 'open'
+            'service_id' => $request->service,
+            'status' => 'open'
         ]);
-        
-        $phone = $employee->phone;
-        $name = str_replace(' ', "%20", $employee->first_name . ' ' . $employee->last_name);
-        $service = "M002";
-        $taskId = $task->id;
-        $taskName = str_replace(" ", "%20", $request->task);
-        $taskCreator = str_replace(" ", "%20", $user->name);
-
-        
-        $client = new Client();
-        $url = env("API_URL")  . $phone . '?' . 'name=' . $name . '&service=' . $service . '&taskId=' . $taskId . '&task=' . $taskName . '&taskCreator=' . $taskCreator;
-        $storeToBot = $client->post($url);
-
-        if ($task) {
-            $request->session()->flash('success', "Task Berhasil ditambahkan ke $employee->first_name");
-        } else {
-            $request->session()->flash('error', "Task Gagal Ditambahkan");
+        try {
+            $phone = $employee->phone;
+            $name = str_replace(' ', "%20", $employee->first_name . ' ' . $employee->last_name);
+            $service = "M002";
+            $taskId = $task->id;
+            $taskName = str_replace(" ", "%20", $request->task);
+            $taskCreator = str_replace(" ", "%20", $user->name);
+            $client = new Client();
+            
+            $url = env("API_URL")  . $phone . '?' . 'name=' . $name . '&service=' . $service . '&taskId=' . $taskId . '&task=' . $taskName . '&taskCreator=' . $taskCreator;
+            $storeToBot = $client->post($url);
+            if ($task) {
+                return redirect()->back()->with('success', "Task Berhasil ditambahkan ke $employee->first_name");
+            } else {
+                return redirect()->back()->with('error', "Task Gagal Ditambahkan");
+            }
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('success', "Task Berhasil ditambahkan ke $employee->first_name, Bot Notifikasi tidak Terkirim");
         }
-
-        return redirect()->back();
     }
 
-    public function cancel_task(Request $request,$id) {
-        $task = Task::where('id',$id)->first();
+    public function cancel_task(Request $request, $id)
+    {
+        $task = Task::where('id', $id)->first();
         $task->update([
-           'status'=> 'cancel',
-           'note'=> $request->note, 
+            'status' => 'cancel',
+            'note' => $request->note,
         ]);
-        $phone = $task->employee->phone;
-        $name = str_replace(' ', "%20", $task->employee->first_name . ' '. $task->employee->last_name);
-        $service = "M007";
-        $taskId = $task->id;
-        $taskName = str_replace(" ", "%20", $task->task);
-        $taskCreator = str_replace(" ", "%20", $task->user->name);
-        
-        $client = new Client();
-        $url = env("API_URL")  . $phone . '?' . 'name=' . $name . '&service=' . $service . '&taskId=' . $taskId . '&task=' . $taskName . '&taskCreator=' . $taskCreator;
-        $storeToBot = $client->post($url);
-        
-        $request->session()->flash('success', "Task Berhasil Di Cancel");
+        try {
+            $phone = $task->employee->phone;
+            $name = str_replace(' ', "%20", $task->employee->first_name . ' ' . $task->employee->last_name);
+            $service = "M007";
+            $taskId = $task->id;
+            $taskName = str_replace(" ", "%20", $task->task);
+            $taskCreator = str_replace(" ", "%20", $task->user->name);
 
-        return redirect()->back();
+            $client = new Client();
+            $url = env("API_URL")  . $phone . '?' . 'name=' . $name . '&service=' . $service . '&taskId=' . $taskId . '&task=' . $taskName . '&taskCreator=' . $taskCreator;
+            $storeToBot = $client->post($url);
+
+            return redirect()->back()->with('success', 'Task Berhasil Di Cancel');
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('success', 'Task Berhasil Di Cancel, Bot Notifikasi tidak Terkirim');
+        }
     }
 
-    public function approved_task($id) {
-        $task = Task::where('id',$id)->first();
+    public function approved_task($id)
+    {
+        $task = Task::where('id', $id)->first();
         $task->update([
-            'is_approved'=> 1,
-            'status'=> 'confirmed'
+            'is_approved' => 1,
+            'status' => 'confirmed'
         ]);
+        try {
+            $phone = $task->employee->phone;
+            $name = str_replace(' ', "%20", $task->employee->first_name . ' ' . $task->employee->last_name);
+            $service = "M008";
+            $taskId = $task->id;
+            $taskName = str_replace(" ", "%20", $task->task);
+            $taskCreator = str_replace(" ", "%20", $task->user->name);
+            $deadline = $task->deadline;
 
-        $phone = $task->employee->phone;
-        $name = str_replace(' ', "%20", $task->employee->first_name . ' '. $task->employee->last_name);
-        $service = "M008";
-        $taskId = $task->id;
-        $taskName = str_replace(" ", "%20", $task->task);
-        $taskCreator = str_replace(" ", "%20", $task->user->name);
-        $deadline = $task->deadline;
-        
-        $client = new Client();
-        $url = env("API_URL")  . $phone . '?' . 'name=' . $name . '&service=' . $service . '&taskId=' . $taskId . '&task=' . $taskName . '&taskCreator=' . $taskCreator.'&deadlineDate='.$deadline;
-        $storeToBot = $client->post($url);
-        
-        return redirect()->route('admin.task.index')->with('success','Task Berhasil di Approved');
+            $client = new Client();
+            $url = env("API_URL")  . $phone . '?' . 'name=' . $name . '&service=' . $service . '&taskId=' . $taskId . '&task=' . $taskName . '&taskCreator=' . $taskCreator . '&deadlineDate=' . $deadline;
+            $storeToBot = $client->post($url);
+
+            return redirect()->route('admin.task.index')->with('success', 'Task Berhasil di Approved');
+        } catch (\Throwable $th) {
+            return redirect()->route('admin.task.index')->with('success', 'Task Berhasil di Approve, Bot Notifikasi tidak Terkirim ');
+        }
     }
 }

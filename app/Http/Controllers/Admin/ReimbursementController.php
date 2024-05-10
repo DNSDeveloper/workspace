@@ -8,6 +8,7 @@ use App\Exports\TesExport;
 use App\Http\Controllers\Controller;
 use App\Reimbursement;
 use Carbon\Carbon;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Image;
 use Maatwebsite\Excel\Facades\Excel;
@@ -49,6 +50,25 @@ class ReimbursementController extends Controller
                 "file_admin" => $input['file'],
                 "tanggal_transfer" => $request->tgl_transfer
             ];
+            $dataBot = [
+                "name" => $reimbursements->employee->first_name . ' ' . $reimbursements->employee->last_name,
+                "deskripsi" => preg_replace( "/\r|\n/", "", $reimbursements->deskripsi),
+                "nominal" => number_format($reimbursements->nominal, 0, 0, "."),
+                "code" => "R002"
+            ];
+            $header = [
+                'Content-Type' => 'application/json',
+            ];
+            $client = new Client();
+            $url = env("API_URL") . 'call-service/' . $reimbursements->employee->phone;
+            try {
+                $storeToBot = $client->post($url, [
+                    "headers" => $header,
+                    "json" => $dataBot
+                ]);
+            } catch (\Throwable $th) {
+                return redirect()->back()->with('success', 'Berhasil Mengupdate Reimburserment, Bot Notifikasi tidak Terkirim');
+            }
         }
         $data['status'] = $request->status;
         $reimbursements->update($data);

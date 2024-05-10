@@ -107,6 +107,10 @@ class EmployeeController extends Controller
             ->whereDate('created_at', Carbon::now())
             ->first();
 
+            $availableSeats = array_diff(range(1,10));
+            $randomSeat = array_rand($availableSeats);
+            
+dd(range(1,10),rand(1,10),$availableSeats,$randomSeat);
         $uangHarians = $this->kalkulasiUangHarian();
         $data = [
             'employee' => Auth::user()->employee,

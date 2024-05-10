@@ -4,6 +4,7 @@ namespace App\Console;
 
 use App\Attendance;
 use App\Employee;
+use App\Jobs\TesJobs;
 use App\Subtask;
 use App\Task;
 use Carbon\Carbon;
@@ -96,43 +97,47 @@ class Kernel extends ConsoleKernel
         //     }
         // })->monthly();
 
-        $schedule->call(function () {
-            $tasks = Task::where('is_approved', 1)
-                ->whereIn('status', ['open', 'confirmed', 'on progress'])
-                ->get();
-                try {
-                    Log::info('success');
-                    foreach ($tasks as $task) {
-                        $today = date('Y-m-d H:i',strtotime(Carbon::now()));
-                        $phone = $task->employee->phone;
-                        $name = str_replace(' ', "%20", $task->employee->first_name . ' '. $task->employee->last_name);
-                        $taskId = $task->id;
-                        $taskName = str_replace(" ", "%20", $task->task);
-                        $taskCreator = str_replace(" ", "%20", $task->user->name);
-                        $client = new Client();
-                        $deadline = Carbon::parse($task->deadline);
-                        if(date('Y-m-d H:i',strtotime($deadline->subDay(1))) === $today) {
-                            $service = "M003";
-                            $url = env("API_URL")  . $phone . '?' . 'name=' . $name . '&service=' . $service . '&taskId=' . $taskId . '&task=' . $taskName . '&taskCreator=' . $taskCreator;
-                            $storeToBot = $client->post($url);
-                            Log::info('H-1 TERKIRIM KE '.$task->employee->first_name);
-                        } else if (date('Y-m-d',strtotime($deadline)).' 00:00' === $today.' 00:00') {
-                            $service = "M004";
-                            $url = env("API_URL")  . $phone . '?' . 'name=' . $name . '&service=' . $service . '&taskId=' . $taskId . '&task=' . $taskName . '&taskCreator=' . $taskCreator;
-                            $storeToBot = $client->post($url);
-                            Log::info('H0 TERKIRIM KE '.$task->employee->first_name);
-                        } else if (date('Y-m-d',strtotime($deadline->addDay(1))).' 00:00' === $today.' 00:00') {
-                            $service = "M005";
-                            $url = env("API_URL")  . $phone . '?' . 'name=' . $name . '&service=' . $service . '&taskId=' . $taskId . '&task=' . $taskName . '&taskCreator=' . $taskCreator;
-                            $storeToBot = $client->post($url);
-                            Log::info('H+1 TERKIRIM KE '.$task->employee->first_name);
-                        }
-                    }
-                } catch (\Throwable $th) {
-                    Log::info($th);
-                    return;
-                }
-        })->everyMinute();
+        // $schedule->call(function () {
+        //     $tasks = Task::where('is_approved', 1)
+        //         ->whereIn('status', ['open', 'confirmed', 'on progress'])
+        //         ->get();
+        //         try {
+        //             Log::info('success');
+        //             foreach ($tasks as $task) {
+        //                 $today = date('Y-m-d H:i',strtotime(Carbon::now()));
+        //                 $phone = $task->employee->phone;
+        //                 $name = str_replace(' ', "%20", $task->employee->first_name . ' '. $task->employee->last_name);
+        //                 $taskId = $task->id;
+        //                 $taskName = str_replace(" ", "%20", $task->task);
+        //                 $taskCreator = str_replace(" ", "%20", $task->user->name);
+        //                 $client = new Client();
+        //                 $deadline = Carbon::parse($task->deadline);
+        //                 if(date('Y-m-d H:i',strtotime($deadline->subDay(1))) === $today) {
+        //                     $service = "M003";
+        //                     $url = env("API_URL")  . $phone . '?' . 'name=' . $name . '&service=' . $service . '&taskId=' . $taskId . '&task=' . $taskName . '&taskCreator=' . $taskCreator;
+        //                     $storeToBot = $client->post($url);
+        //                     Log::info('H-1 TERKIRIM KE '.$task->employee->first_name);
+        //                 } else if (date('Y-m-d',strtotime($deadline)).' 00:00' === $today.' 00:00') {
+        //                     $service = "M004";
+        //                     $url = env("API_URL")  . $phone . '?' . 'name=' . $name . '&service=' . $service . '&taskId=' . $taskId . '&task=' . $taskName . '&taskCreator=' . $taskCreator;
+        //                     $storeToBot = $client->post($url);
+        //                     Log::info('H0 TERKIRIM KE '.$task->employee->first_name);
+        //                 } else if (date('Y-m-d',strtotime($deadline->addDay(1))).' 00:00' === $today.' 00:00') {
+        //                     $service = "M005";
+        //                     $url = env("API_URL")  . $phone . '?' . 'name=' . $name . '&service=' . $service . '&taskId=' . $taskId . '&task=' . $taskName . '&taskCreator=' . $taskCreator;
+        //                     $storeToBot = $client->post($url);
+        //                     Log::info('H+1 TERKIRIM KE '.$task->employee->first_name);
+        //                 }
+        //             }
+        //         } catch (\Throwable $th) {
+        //             Log::info($th);
+        //             return;
+        //         }
+        // })->everyMinute();
+        
+        $schedule->command('reminder:masuk')->dailyAt('10:36')->withoutOverlapping();
+
+
     }
 
     /**

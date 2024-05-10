@@ -34,6 +34,8 @@
     <link rel="stylesheet" href="/plugins/daterangepicker/daterangepicker.css">
     <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
     <link rel="stylesheet" href="/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     {{--
     <link rel="stylesheet" href="/css/daterangepicker.css"> --}}
     <style>
@@ -138,6 +140,8 @@
             <script src="/plugins/select2/js/select2.full.min.js"></script>
             {{-- <script src="/js/daterangepicker.js"></script> --}}
             {{-- <script src="/js/moment.min.js"></script> --}}
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
             <script>
                 $(function() {
                     // $('#select2').select2()

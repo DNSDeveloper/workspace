@@ -66,11 +66,6 @@
                             required>
                     </div>
 
-                    {{-- <div class="mb-3">
-                        <label for="">Tanggal Transfer</label>
-                        <input type="date" class="form-control" name="tgl_transfer" required>
-                    </div> --}}
-
                     <div class="mb-3">
                         <label for="">File</label>
                         <input type="file" class="form-control" name="file">
@@ -293,6 +288,7 @@
                                             </i>
                                         </button>
                                         @endif
+                                        <button data-id="{{ $reimbursement->id }}" class="btn btn-danger delete-reimbursement"><i class="fas fa-trash"></i></button>
                                     </td>
                                 </tr>
                                 @endforeach
@@ -310,13 +306,53 @@
 
 <script>
     $(document).ready(function(){
-    $('#dataTable').DataTable({
+    var table = $('#dataTable').DataTable({
         responsive:true,
         autoWidth: false,
     });
-});
+
+    $('body').on('click', '.delete-reimbursement', function () {
+        var id = $(this).data("id");
+            Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                var urlDelete = "{{ route('employee.reimbursements.delete',':id') }}".replace(':id',id)
+                    $.ajax({
+                        type: "DELETE",
+                        url: urlDelete,
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function (data) {
+                            Swal.fire({
+                                title: "Deleted!",
+                                text: data.success,
+                                icon: "success"
+                            });
+                            setTimeout(() => {
+                                location.reload() 
+                            }, 2000);
+                        },
+                    error: function (data) {
+                        console.log('Error:', data);
+                        }
+                    });
+                }
+            });
+        });
+    });
 </script>
 <script>
+    
+
+
     let dengan_rupiah = document.getElementById('nominal');
     dengan_rupiah.addEventListener('keyup', function (e) {
     dengan_rupiah.value = formatRupiah(this.value, 'Rp. ');
