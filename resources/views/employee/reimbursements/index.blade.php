@@ -20,65 +20,7 @@
         </div>
     </div>
 </div>
-
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Add Reimbursement</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form action="{{ route('employee.reimbursements.store') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="">Tanggal Reimbursement</label>
-                        <input type="date" name="tgl_reimbursement" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="">Minggu Ke-</label>
-                        <input type="number" readonly name="minggu" value="{{ $week }}" placeholder="Minggu Ke-"
-                            class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="">Jenis</label>
-                        <select name="jenis" id="" class="form-control" required>
-                            <option value="" hidden selected>-- Pilih Jenis --</option>
-                            <option value="transportasi">Transportasi</option>
-                            <option value="konsumsi">Konsumsi</option>
-                            <option value="kebutuhan kantor">Kebutuhan Kantor</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="">Deskripsi</label>
-                        <textarea required placeholder="Deskripsi" class="form-control" name="deskripsi" id="" cols="30"
-                            rows="3"></textarea>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="">Nominal</label>
-                        <input id="nominal" type="text" placeholder="Nominal" class="form-control" name="nominal"
-                            required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="">File</label>
-                        <input type="file" class="form-control" name="file">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+@include('employee.reimbursements.forms')
 <section class="content">
     <div class="container-fluid">
         <div class="row">
@@ -95,7 +37,7 @@
                                 action="{{ route('employee.reimbursements.export')}}">
                                 <div class="mr-2">
                                     <select name="minggu" id="" class="form-control">
-                                        <option value="">Minggu Ke- </option>
+                                        <option value="">Jumat Ke- </option>
                                         <option value="1">1</option>
                                         <option value="2">2</option>
                                         <option value="3">3</option>
@@ -120,7 +62,8 @@
                                     @endif
                                     <th>Jenis</th>
                                     <th>Deskripsi</th>
-                                    <th>Minggu Ke-</th>
+                                    <th>Tujuan</th>
+                                    <th>Jumat Ke-</th>
                                     <th class="text-center">Info</th>
                                     <th class="text-center">File</th>
                                     <th>Status</th>
@@ -137,6 +80,7 @@
                                     @endif
                                     <td>{{ ucfirst($reimbursement->jenis) }}</td>
                                     <td>{{ ucfirst($reimbursement->deskripsi) }}</td>
+                                    <td>{{ ucfirst($reimbursement->tujuan) }}</td>
                                     <td>{{ $reimbursement->minggu }}</td>
                                     <td>
                                         <table class="d-flex justify-content-center">
@@ -203,82 +147,6 @@
                                     </td>
                                     <td>{{ ucfirst($reimbursement->catetan) }}</td>
                                     <td>
-                                        <div class="modal fade" id="updateReimburse{{ $reimbursement->id }}"
-                                            tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-                                            aria-hidden="true">
-                                            <div class="modal-dialog modal-lg" role="document">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="exampleModalLabel">Update
-                                                            Reimbursement
-                                                        </h5>
-                                                        <button type="button" class="close" data-dismiss="modal"
-                                                            aria-label="Close">
-                                                            <span aria-hidden="true">&times;</span>
-                                                        </button>
-                                                    </div>
-                                                    <form
-                                                        action="{{ route('employee.reimbursements.update',$reimbursement->id) }}"
-                                                        method="POST" enctype="multipart/form-data">
-                                                        @csrf
-                                                        <div class="modal-body">
-                                                            <div class="mb-3">
-                                                                <label for="">Tanggal Reimbursement</label>
-                                                                <input type="date"
-                                                                    value="{{ date('Y-m-d',strtotime($reimbursement->tanggal_reimbursement)) }}"
-                                                                    name="tgl_reimbursement" class="form-control"
-                                                                    required>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label for="">Minggu Ke-</label>
-                                                                <input type="number" name="minggu"
-                                                                    placeholder="Minggu Ke-"
-                                                                    value="{{ $reimbursement->minggu }}"
-                                                                    class="form-control" required>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label for="">Jenis</label>
-                                                                <select name="jenis" id="" class="form-control"
-                                                                    required>
-                                                                    <option value="" hidden selected>-- Pilih Jenis --
-                                                                    </option>
-                                                                    <option value="transportasi" {{ $reimbursement->
-                                                                        jenis == 'transportasi' ? 'selected' : ''
-                                                                        }}>Transportasi</option>
-                                                                    <option value="konsumsi" {{ $reimbursement->jenis ==
-                                                                        'konsumsi' ? 'selected' : '' }}>Konsumsi
-                                                                    </option>
-                                                                    <option value="kebutuhan kantor" {{ $reimbursement->
-                                                                        jenis == 'kebutuhan kantor' ? 'selected' : ''
-                                                                        }}>Kebutuhan Kantor</option>
-                                                                </select>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label for="">Deskripsi</label>
-                                                                <textarea required placeholder="Deskripsi"
-                                                                    class="form-control" name="deskripsi" id=""
-                                                                    cols="30"
-                                                                    rows="3">{{ $reimbursement->deskripsi }}</textarea>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label for="">Nominal</label>
-                                                                <input id="nominal-{{ $reimbursement->id }}"
-                                                                    onkeyup="tes({{ $reimbursement->id }})"
-                                                                    value="@currency($reimbursement->nominal)"
-                                                                    type="text" placeholder="Nominal"
-                                                                    class="form-control" name="nominal" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary"
-                                                                data-dismiss="modal">Close</button>
-                                                            <button type="submit"
-                                                                class="btn btn-primary">Submit</button>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
                                         @if($reimbursement->status !== 'paid')
                                         <button class="btn btn-success"
                                             data-target="#updateReimburse{{ $reimbursement->id }}" data-toggle="modal"
@@ -288,7 +156,9 @@
                                             </i>
                                         </button>
                                         @endif
-                                        <button data-id="{{ $reimbursement->id }}" class="btn btn-danger delete-reimbursement"><i class="fas fa-trash"></i></button>
+                                        <button data-id="{{ $reimbursement->id }}"
+                                            class="btn btn-danger delete-reimbursement"><i
+                                                class="fas fa-trash"></i></button>
                                     </td>
                                 </tr>
                                 @endforeach
@@ -348,15 +218,68 @@
             });
         });
     });
+    function setTransportDescription() {
+        var jenis = $('#jenis').val();
+        var tujuan = $('#tujuan').val();
+        var deskripsi = "";
+        var isShowTujuan = $("#tujuanSection")
+        var isShowTipe = $("#tipeSection")
+        if (jenis === "transportasi") {
+            deskripsi = "Reimbursement Transportasi \n\nGojek dari ... ke ... + Admin\nRp. ... + Rp. ...";
+            isShowTujuan.show()
+            isShowTipe.show()
+            tujuan === 'Lainnya' ? $("#lainnyaInput").show() : $("#lainnyaInput").hide()  
+        } else {
+            isShowTujuan.hide()
+            isShowTipe.hide()
+            isShowTujuan.val('')
+            isShowTipe.val('');
+        }
+
+        $("#deskripsi").val(deskripsi);
+    }
+
+    // Event listener untuk perubahan pada jenis transportasi
+    $('#jenis').on('change', function() {
+        setTransportDescription();
+    });
+
+    // Event listener untuk perubahan pada opsi tujuan
+    $('#tujuan').on('change', function() {
+        setTransportDescription();
+    });
+
+    
 </script>
 <script>
-    
+    $(document).on('change', '.jenis-update', function() {
+        var id = $(this).data('id');
+        var jenisUpdate = $('#jenis-' + id).val();
+        
+        var isShowTujuan = $("#tujuanSection-"+id)
+        var isShowTipe = $("#tipeSection-"+id)
+        if (jenisUpdate === "transportasi") {
+            isShowTujuan.show()
+            isShowTipe.show()
+        } else {
+            isShowTujuan.hide()
+            isShowTipe.hide()
+            isShowTujuan.val('')
+            isShowTipe.val('');
+        }
+
+    });
+    $(document).on('change', '.tujuan-update', function() {
+        var id = $(this).data('id');
+        var jenisUpdate = $('#tujuan-' + id).val();
+        jenisUpdate === 'Lainnya' ? $('#lainnyaInput-'+id).show() : $('#lainnyaInput-'+id).hide() 
+    })
 
 
     let dengan_rupiah = document.getElementById('nominal');
     dengan_rupiah.addEventListener('keyup', function (e) {
-    dengan_rupiah.value = formatRupiah(this.value, 'Rp. ');
-});
+        dengan_rupiah.value = formatRupiah(this.value, 'Rp. ');
+    });
 
 /* Fungsi */
 function formatRupiah(angka, prefix) {

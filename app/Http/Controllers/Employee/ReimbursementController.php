@@ -55,36 +55,44 @@ class ReimbursementController extends Controller
         })->save($destinationPath . '/' . $input['file']);
         $image->move($destinationPath, $input['file']);
 
+        $tujuan = $request->tujuan;
+        if($tujuan == 'Lainnya') {
+            $tujuan = $request->tujuan_lainnya;
+        }
+
         $reimbursements = Reimbursement::create([
             'employee_id' => auth()->user()->employee->id,
             'tanggal_reimbursement' => $request->tgl_reimbursement,
             'minggu' => $request->minggu,
             'jenis' => $request->jenis,
+            'tujuan'=> $tujuan,
+            'tipe'=> $request->tipe,
             'deskripsi' => $request->deskripsi,
             'nominal' => $nominal,
             'status' => 'requested',
             'file_employee' => $input['file']
         ]);
-        try {
-            $header = [
-                'Content-Type' => 'application/json',
-            ];
-            $data = [
-                "name" => auth()->user()->employee->first_name . ' ' . auth()->user()->employee->last_name,
-                "deskripsi" => preg_replace("/\r|\n/", "", $request->deskripsi),
-                "nominal" => $nominal,
-                'code' => "R001"
-            ];
-            $client = new Client();
-            $url = env("API_URL") . 'call-service/' . '6281387297959';
-            $storeToBot = $client->post($url, [
-                "headers" => $header,
-                "json" => $data
-            ]);
-            return redirect()->back()->with('success', 'Berhasil Menambah Reimbursement');
-        } catch (\Throwable $th) {
-            return redirect()->back()->with('success', 'Berhasil Menambah Reimbursement, Bot Notifikasi tidak Terkirim');
-        }
+        // try {
+        //     $header = [
+        //         'Content-Type' => 'application/json',
+        //     ];
+        //     $data = [
+        //         "name" => auth()->user()->employee->first_name . ' ' . auth()->user()->employee->last_name,
+        //         "deskripsi" => preg_replace("/\r|\n/", "", $request->deskripsi),
+        //         "nominal" => $nominal,
+        //         'code' => "R001"
+        //     ];
+        //     $client = new Client();
+        //     $url = env("API_URL") . 'call-service/' . '6281387297959';
+        //     $storeToBot = $client->post($url, [
+        //         "headers" => $header,
+        //         "json" => $data
+        //     ]);
+        //     return redirect()->back()->with('success', 'Berhasil Menambah Reimbursement');
+        // } catch (\Throwable $th) {
+        //     return redirect()->back()->with('success', 'Berhasil Menambah Reimbursement, Bot Notifikasi tidak Terkirim');
+        // }
+        return redirect()->back();
     }
 
     public function update(Request $request, $id)
@@ -92,11 +100,18 @@ class ReimbursementController extends Controller
         $nominal = str_replace('.', '', $request->nominal);
         $nominal = str_replace("Rp ", "", $nominal);
         $reimbursements = Reimbursement::where('id', $id)->first();
+
+        $tujuan = $request->tujuan;
+        if($tujuan == 'Lainnya') {
+            $tujuan = $request->tujuan_lainnya;
+        }
         $reimbursements->update([
             'employee_id' => auth()->user()->employee->id,
             'tanggal_reimbursement' => $request->tgl_reimbursement,
             'minggu' => $request->minggu,
             'jenis' => $request->jenis,
+            'tujuan'=> $tujuan,
+            'tipe'=> $request->tipe,
             'deskripsi' => $request->deskripsi,
             'nominal' => $nominal,
             'status' => 'requested',

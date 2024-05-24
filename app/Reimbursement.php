@@ -14,6 +14,8 @@ class Reimbursement extends Model
         'tanggal_reimbursement',
         'minggu',
         'jenis',
+        'tujuan',
+        'tipe',
         'deskripsi',
         'nominal',
         'tanggal_transfer', 
