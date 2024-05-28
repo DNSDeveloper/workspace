@@ -317,6 +317,8 @@
                                                     <label for="">Report</label>
                                                     <textarea name="report" id="summernote"></textarea>
                                                 </div>
+                                                <input type="text"id="lat"  name="lat" >
+                                                <input type="text"id="long" name="long" >
                                             </div>
                                             <input type="text" hidden name="employee_id" value="{{ $employee->id }}">
                                             <div class="modal-footer">

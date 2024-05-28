@@ -91,154 +91,161 @@ class AttendanceController extends Controller
         return view('employee.attendance.create')->with($data);   
     }
     
-    public function store(Request $request, $employee_id) {
-    $lat1 = deg2rad('-6.191374');
-    $long1 = deg2rad('106.836418');
-    $lat2 = deg2rad("$request->lat");
-    $long2 = deg2rad("$request->long");
-    
-       //Haversine Formula
-       $radius = 6371000;
-       // Selisih latitud dan longitud
-       $dlat = $lat2 - $lat1;
-       $dlon = $long2 - $long1;
-   
-       // Haversine formula
-       $a = sin($dlat/2) * sin($dlat/2) + cos($lat1) * cos($lat2) * sin($dlon/2) * sin($dlon/2);
-       $c = 2 * atan2(sqrt($a), sqrt(1-$a));
-   
-       // Jarak dalam meter
-       $distance = $radius * $c;
-       $km = $distance/1000;
-    //    dd($distance,$km);
-
-    // dd($km);
-       if($km > 20) {
-        $request->session()->flash('error','Kamu diluar Kantor, ke Kantor Sekarang!😡🤬');
-        return redirect()->back();
-       }else {
-        $img = $request->image;
-        $folderPath = "img_present/";
+    public function radius($lat,$long) {
+        $lat1 = deg2rad('-6.191374');
+        $long1 = deg2rad('106.836418');
+        $lat2 = deg2rad("$lat");
+        $long2 = deg2rad("$long");
         
-        $image_parts = explode(";base64,", $img);
-        $image_type_aux = explode("image/", $image_parts[0]);
-        $image_type = $image_type_aux[1];
-        
-        $image_base64 = base64_decode($image_parts[1]);
-        $fileName = uniqid() . '.png';
-        
-        $file = $folderPath . $fileName;
-        file_put_contents(public_path().'/img_present/'.$fileName,$image_base64);
-
-        $selectedSeats = Attendance::whereDate('created_at',Carbon::now())
-        ->pluck('no_kursi')
-        ->toArray(); 
-
-        $kel1 = [1,2,3,4,5];
-        $kel2 = [6,7];
-        $kel3 = [9,10];
-
-        $except = [1,2,8];
-        $no_kursi = '';
-        if(empty($selectedSeats)) {
-            $availableSeats = array_diff(range(1,10), $except, $selectedSeats);
-            $randomSeat = array_rand($availableSeats);
-            if($employee_id == "6") {
-                $no_kursi = 1;
-            } else if ($employee_id == "5") {
-                $no_kursi = 2;   
-            }else {
-                $no_kursi = $availableSeats[$randomSeat];
-            }
-            Log::info('kondisi 1 '. $no_kursi);
-        } else {
-            if(in_array($selectedSeats[0],$kel1)) {
-                if(end($selectedSeats)>= 9) {
-                    $availableSeats = array_diff($kel2, $selectedSeats);
-                } else if((end($selectedSeats) == 6 ) || (end($selectedSeats) == 7) ) {
-                    $availableSeats = array_diff($kel1, $except, $selectedSeats);
-                } else{
-                    $availableSeats = array_diff($kel3, $selectedSeats);
-                };
-            } else if(in_array($selectedSeats[0],$kel2)) {
-                if(end($selectedSeats)>= 9) {
-                    $availableSeats = array_diff($kel2, $selectedSeats);
-                } else if((end($selectedSeats) >= 3) && (end($selectedSeats) <= 5) ) {
-                    $availableSeats = array_diff($kel3, $selectedSeats);
-                } else{
-                    $availableSeats = array_diff($kel1, $except,$selectedSeats);
-                };
-            }  else if(in_array($selectedSeats[0],$kel3)) {
-                if((end($selectedSeats) == 6) || (end($selectedSeats) == 7)) {
-                    $availableSeats = array_diff($kel3, $selectedSeats);
-                } else if((end($selectedSeats) >= 3) && (end($selectedSeats) <= 5) ) {
-                    $availableSeats = array_diff($kel2, $selectedSeats);
-                } else{
-                    $availableSeats = array_diff($kel1, $except, $selectedSeats);
-                };
-            } 
-            if(empty($availableSeats)) {
-                $availableSeats = array_diff(range(1,10),$except, $selectedSeats);
-                $randomSeat = array_rand($availableSeats);
-                if($employee_id == "6") {
-                    $no_kursi = 1;
-                } else if ($employee_id == "5") {
-                    $no_kursi = 2;   
-                } else {
-                    $no_kursi = $availableSeats[$randomSeat];
-                }
-                Log::info('kondisi 2 '. $no_kursi);
-            }
-            $randomSeat = array_rand($availableSeats);
-            if($employee_id == "6") {
-                $no_kursi = 1;
-            } else if ($employee_id == "5") {
-                $no_kursi = 2;   
-            }else {
-                $no_kursi = $availableSeats[$randomSeat];
-            }
-            Log::info('kondisi 3 '. $no_kursi);
-        }
-        
-        $attendance = Attendance::create([
-            'employee_id' => $employee_id,
-            'entry_ip' => $request->ip(),
-            'time' => date('h'),
-            'entry_location' => $request->entry_location,
-            'jam_masuk'=> date('H:i'),
-            'img_present'=> $file,
-            'no_kursi'=> $no_kursi,
-            'status'=>date('H:i') > '09:00' ? 'terlambat' : 'hadir'
-        ]);
-        
-        if(date('H:i')<='09:30') {
-         $request->session()->flash('success', "Keren! Kamu Datang Tepat Waktu 🤩, Silahkan duduk di kursi $attendance->no_kursi");
-         } else {
-            $request->session()->flash('error', "Opps Kamu Terlambat 🥲, Silahkan duduk di kursi $attendance->no_kursi");
-         }
-        return redirect()->route('employee.attendance.create')->with('employee', Auth::user()->employee)->with('masuk','Selamat Bekerja');
+           $radius = 6371000;
+           $dlat = $lat2 - $lat1;
+           $dlon = $long2 - $long1;
+       
+           $a = sin($dlat/2) * sin($dlat/2) + cos($lat1) * cos($lat2) * sin($dlon/2) * sin($dlon/2);
+           $c = 2 * atan2(sqrt($a), sqrt(1-$a));
+       
+           $distance = $radius * $c;
+           $km = $distance/1000;
+           return $km;
     }
-       }
-
+    public function store(Request $request, $employee_id) {
+        $radius = $this->radius($request->lat,$request->long);
+        if($radius > 0.08) {
+            return redirect()->back()->with('error','Kamu diluar Kantor, ke Kantor Sekarang');
+        }else {
+            $img = $request->image;
+            $folderPath = "img_present/";
+            
+            $image_parts = explode(";base64,", $img);
+            $image_type_aux = explode("image/", $image_parts[0]);
+            $image_type = $image_type_aux[1];
+            
+            $image_base64 = base64_decode($image_parts[1]);
+            $fileName = uniqid() . '.png';
+            
+            $file = $folderPath . $fileName;
+            file_put_contents(public_path().'/img_present/'.$fileName,$image_base64);
     
+            $selectedSeats = Attendance::whereDate('created_at',Carbon::now())
+            ->pluck('no_kursi')
+            ->toArray(); 
+    
+            $kel1 = [1,2,3,4,5];
+            $kel2 = [6,7];
+            $kel3 = [9,10];
+    
+            $except = [8];
+            $no_kursi = '';
+
+            // penambahan
+            $today = Carbon::today();
+
+            if ($today->isMonday()) {
+                $targetDate = $today->subDays(3); // Jumat
+            } else {
+                $targetDate = $today->subDay(); // Hari kemarin
+            }            
+            $getLatestSeats = Attendance::whereDate('created_at', $targetDate)
+            ->orderBy('created_at', 'asc')
+            ->first();
+
+            if(empty($selectedSeats)) {
+                if($getLatestSeats->employee_id == $employee_id) {
+                    if(in_array($getLatestSeats->no_kursi,$kel1)) {
+                        $availableSeats = array_diff(range(1,10),[1,2,3,4,5,8],$selectedSeats);
+                    } else if(in_array($getLatestSeats->no_kursi, $kel2)) {
+                        $availableSeats = array_diff(range(1,10),[6,7,8] ,$selectedSeats);
+                    } else if(in_array($getLatestSeats->no_kursi, $kel3)) {
+                        $availableSeats = array_diff(range(1,10),[9,10,8] ,$selectedSeats);
+                    }
+                    $randomSeat = array_rand($availableSeats);
+                    $no_kursi = $availableSeats[$randomSeat];
+                    dd($no_kursi);
+                }
+                // 
+                $availableSeats = array_diff(range(1,10), $except, $selectedSeats);
+                $randomSeat = array_rand($availableSeats);
+                $no_kursi = $availableSeats[$randomSeat];
+                Log::info('kondisi 1 '. $no_kursi);
+            } else {
+                if(in_array($selectedSeats[0],$kel1)) {
+                    if(end($selectedSeats)>= 9) {
+                        $availableSeats = array_diff($kel2, $selectedSeats);
+                    } else if((end($selectedSeats) == 6 ) || (end($selectedSeats) == 7) ) {
+                        $availableSeats = array_diff($kel1, $except, $selectedSeats);
+                    } else{
+                        $availableSeats = array_diff($kel3, $selectedSeats);
+                    };
+                } else if(in_array($selectedSeats[0],$kel2)) {
+                    if(end($selectedSeats)>= 9) {
+                        $availableSeats = array_diff($kel2, $selectedSeats);
+                    } else if((end($selectedSeats) >= 1) && (end($selectedSeats) <= 5) ) {
+                        $availableSeats = array_diff($kel3, $selectedSeats);
+                    } else{
+                        $availableSeats = array_diff($kel1, $except,$selectedSeats);
+                    };
+                }  else if(in_array($selectedSeats[0],$kel3)) {
+                    if((end($selectedSeats) == 6) || (end($selectedSeats) == 7)) {
+                        $availableSeats = array_diff($kel3, $selectedSeats);
+                    } else if((end($selectedSeats) >= 1) && (end($selectedSeats) <= 5) ) {
+                        $availableSeats = array_diff($kel2, $selectedSeats);
+                    } else{
+                        $availableSeats = array_diff($kel1, $except, $selectedSeats);
+                    };
+                } 
+                if(empty($availableSeats)) {
+                    $availableSeats = array_diff(range(1,10),$except, $selectedSeats);
+                    $randomSeat = array_rand($availableSeats);
+                    $no_kursi = $availableSeats[$randomSeat];
+                    Log::info('kondisi 2 '. $no_kursi);
+                }
+                $randomSeat = array_rand($availableSeats);
+                $no_kursi = $availableSeats[$randomSeat];
+                Log::info('kondisi 3 '. $no_kursi);
+            }
+            
+            $attendance = Attendance::create([
+                'employee_id' => $employee_id,
+                'entry_ip' => $request->ip(),
+                'time' => date('h'),
+                'entry_location' => $request->entry_location,
+                'jam_masuk'=> date('H:i'),
+                'img_present'=> $file,
+                'no_kursi'=> $no_kursi,
+                'status'=>date('H:i') > '09:30' ? 'terlambat' : 'hadir'
+            ]);
+            Log::info($attendance);
+            if(date('H:i')<='09:30') {
+            $request->session()->flash('success', "Keren! Kamu Datang Tepat Waktu ðŸ¤© ,Selamat Bekerja, jangan lupa berdoa dan membuka workspace, Silahkan duduk di kursi $attendance->no_kursi");
+            } else {
+                $request->session()->flash('error', "Opps Kamu Terlambat ðŸ¥², ,Selamat Bekerja, jangan lupa berdoa dan membuka workspace, Silahkan duduk di kursi $attendance->no_kursi");
+            }
+            return redirect()->route('employee.attendance.create')->with('employee', Auth::user()->employee)->with('masuk','Selamat Bekerja');
+        }
+    }
 
     public function update(Request $request, $attendance_id) {
-        $reports = new DailyReport();
-        $reports->report = $request->report;
-        $reports->employee_id = $request->employee_id;
-        
-        $tasks = json_encode($request->task);
-        $reports->task = $tasks;
-        $reports->save();
-        
-        $attendance = Attendance::findOrFail($attendance_id);
-        $attendance->exit_ip = $request->ip();
-        $attendance->exit_location = $request->exit_location;
-        $attendance->registered = 'yes';
-        $attendance->jam_pulang = date('H:i');
-        $attendance->save();
-        $request->session()->flash('success', 'Absensi Anda berhasil diakhiri');
-        return redirect()->route('employee.attendance.create')->with('employee', Auth::user()->employee)->with('pulang','Selamat Jalan');
+        $radius = $this->radius($request->lat,$request->long);
+        if($radius > 0.03) {
+            return redirect()->back()->with('error','Anda harus absen Pulang di Kantor😅');
+        } else {
+            $reports = new DailyReport();
+            $reports->report = $request->report;
+            $reports->employee_id = $request->employee_id;
+            
+            $tasks = json_encode($request->task);
+            $reports->task = $tasks;
+            $reports->save();
+            
+            $attendance = Attendance::findOrFail($attendance_id);
+            $attendance->exit_ip = $request->ip();
+            $attendance->exit_location = $request->exit_location;
+            $attendance->registered = 'yes';
+            $attendance->jam_pulang = date('H:i');
+            $attendance->save();
+            $request->session()->flash('success', 'Absensi Anda berhasil diakhiri');
+            return redirect()->route('employee.attendance.create')->with('employee', Auth::user()->employee)->with('pulang','Selamat Jalan');
+        }
     }
 
     public function getUserIP()

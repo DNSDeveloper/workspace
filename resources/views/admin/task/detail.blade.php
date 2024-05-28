@@ -76,6 +76,10 @@
                                     </td>
                                 </tr>
                                 <tr>
+                                    <td>Created Date</td>
+                                    <td>{{ date('d-m-Y H:i',strtotime($task->created_at)) }}</td>
+                                </tr>
+                                <tr>
                                     <td>Deadline</td>
                                     <td>{{ date('d-m-Y H:i',strtotime($task->deadline)) }}</td>
                                 </tr>

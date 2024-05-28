@@ -135,7 +135,8 @@ class Kernel extends ConsoleKernel
         //         }
         // })->everyMinute();
         
-        $schedule->command('reminder:masuk')->dailyAt('10:36')->withoutOverlapping();
+        // $schedule->command('reminder:masuk')->dailyAt('10:36')->withoutOverlapping();
+        $schedule->command('approved:task')->everyMinute()->withoutOverlapping();
 
 
     }
