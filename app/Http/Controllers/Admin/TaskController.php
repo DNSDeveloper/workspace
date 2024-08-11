@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Employee;
+use App\Exports\SheetTask;
 use App\Http\Controllers\Controller;
 use App\Service;
 use App\Subtask;
@@ -13,6 +14,7 @@ use Exception;
 use GuzzleHttp\Client;
 use Str;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class TaskController extends Controller
 {
@@ -78,7 +80,7 @@ class TaskController extends Controller
             $taskName = str_replace(" ", "%20", $request->task);
             $taskCreator = str_replace(" ", "%20", $user->name);
             $client = new Client();
-            
+
             $url = env("API_URL")  . $phone . '?' . 'name=' . $name . '&service=' . $service . '&taskId=' . $taskId . '&task=' . $taskName . '&taskCreator=' . $taskCreator;
             $storeToBot = $client->post($url);
             if ($task) {

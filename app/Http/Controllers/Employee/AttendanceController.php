@@ -110,9 +110,10 @@ class AttendanceController extends Controller
     }
     public function store(Request $request, $employee_id) {
         $radius = $this->radius($request->lat,$request->long);
-        if($radius > 0.08) {
+        $isWfo = auth()->user()->employee->is_wfo;
+        if($isWfo === 1 && $radius > 0.08) {
             return redirect()->back()->with('error','Kamu diluar Kantor, ke Kantor Sekarang');
-        }else {
+        }else if(($isWfo === 1 && $radius <= 0.08) || $isWfo === 0) {
             $img = $request->image;
             $folderPath = "img_present/";
             
@@ -160,7 +161,6 @@ class AttendanceController extends Controller
                     }
                     $randomSeat = array_rand($availableSeats);
                     $no_kursi = $availableSeats[$randomSeat];
-                    dd($no_kursi);
                 }
                 // 
                 $availableSeats = array_diff(range(1,10), $except, $selectedSeats);
@@ -221,14 +221,15 @@ class AttendanceController extends Controller
                 $request->session()->flash('error', "Opps Kamu Terlambat ðŸ¥², ,Selamat Bekerja, jangan lupa berdoa dan membuka workspace, Silahkan duduk di kursi $attendance->no_kursi");
             }
             return redirect()->route('employee.attendance.create')->with('employee', Auth::user()->employee)->with('masuk','Selamat Bekerja');
-        }
+        } 
     }
 
     public function update(Request $request, $attendance_id) {
         $radius = $this->radius($request->lat,$request->long);
-        if($radius > 0.03) {
+        $isWfo = auth()->user()->employee->is_wfo;
+        if($isWfo === 1 && $radius > 0.03) {
             return redirect()->back()->with('error','Anda harus absen Pulang di Kantor😅');
-        } else {
+        } else if(($isWfo === 1 && $radius <= 0.08) || $isWfo === 0) {
             $reports = new DailyReport();
             $reports->report = $request->report;
             $reports->employee_id = $request->employee_id;

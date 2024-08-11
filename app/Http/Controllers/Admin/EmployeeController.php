@@ -172,4 +172,14 @@ class EmployeeController extends Controller
         $employee = Employee::findOrFail($employee_id);
         return view('admin.employees.profile')->with('employee', $employee);
     }
+
+    public function toogleWfo(Request $request,$employee_id) { 
+        $employee = Employee::find($employee_id);
+        $employee->update([
+            'is_wfo' => $request->is_wfo
+        ]);
+        return response()->json([
+           'success' => true
+        ]);
+    }
 }

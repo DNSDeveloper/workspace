@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Employee;
 
 use App\Employee;
 use App\EmployeeTaskToEmployee;
+use App\Exports\SheetTask;
 use App\Http\Controllers\Controller;
 use App\Subtask;
 use App\Task;
 use App\Unit;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class TaskController extends Controller
 {
@@ -88,7 +90,7 @@ class TaskController extends Controller
             'attach_done' => $request->file != null ? $filename : null,
             'report_done' => $request->report
         ]);
-        if($request->status == 'done') {
+        if ($request->status == 'done') {
             try {
                 $client = new Client();
                 $url = env("API_URL") . 'call-service/' . $task->employee->phone;
@@ -99,15 +101,15 @@ class TaskController extends Controller
                     'name' => $task->employee->first_name . ' ' . $task->employee->last_name,
                     'id' => $task->id,
                     'subtask' => $task->description,
-                    'code'=> 'S001'
+                    'code' => 'S001'
                 ];
                 $storeToBot = $client->post($url, [
                     'headers' => $headers,
                     'json' => $data,
                 ]);
-                return redirect()->back()->with('success','Subtask Berhasil Diselesaikan');
+                return redirect()->back()->with('success', 'Subtask Berhasil Diselesaikan');
             } catch (\Throwable $th) {
-                return redirect()->back()->with('success','Subtask Berhasil Diselesaikan, Bot Notifikasi tidak Terkirim');
+                return redirect()->back()->with('success', 'Subtask Berhasil Diselesaikan, Bot Notifikasi tidak Terkirim');
             }
         }
         return redirect()->back()->with('success', 'Subtask Berhasil di Update');
@@ -124,7 +126,7 @@ class TaskController extends Controller
         $task = Task::create([
             'employee_id' => auth()->user()->employee->id,
             'user_id' => auth()->user()->id,
-            'task' => preg_replace( "/\r|\n/", "",trim($request->task)),
+            'task' => preg_replace("/\r|\n/", "", trim($request->task)),
             'note' => $request->note,
             'category' => $request->category,
             'deadline' => date('Y-m-d H:i:s', strtotime($request->deadline)),
@@ -201,5 +203,9 @@ class TaskController extends Controller
             ->get();
 
         return view('employee.task.history', compact('tasks', 'subtasks'));
+    }
+    public function export_excel()
+    {
+        return Excel::download(new SheetTask, "Report Task DNS TEAM.xlsx");
     }
 }

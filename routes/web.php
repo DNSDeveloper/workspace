@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\Register2Controller;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Employee\EventController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -44,6 +45,7 @@ Route::namespace('Admin')->prefix('admin')->name('admin.')->middleware(['auth', 
     Route::delete('/employees/attendance/{attendance_id}', 'EmployeeController@attendanceDelete')->name('employees.attendance.delete');
     Route::get('/employees/profile/{employee_id}', 'EmployeeController@employeeProfile')->name('employees.profile');
     Route::delete('/employees/{employee_id}', 'EmployeeController@destroy')->name('employees.delete');
+    Route::post('/employees/toogle-wfo/{employee_id}', 'EmployeeController@toogleWfo')->name('employees.toogleWfo');
     // Routes for employees //
 
     // Routes for leaves //
@@ -126,7 +128,7 @@ Route::namespace('Employee')->prefix('employee')->name('employee.')->middleware(
     Route::put('/expenses/{expense_id}', 'ExpenseController@update')->name('expenses.update');
     Route::delete('/expenses/{expense_id}', 'ExpenseController@destroy')->name('expenses.delete');
     // Routes for Expenses//
-
+    
     // Routes for Self //
     Route::get('/self/holidays', 'SelfController@holidays')->name('self.holidays');
     Route::get('/self/salary_slip', 'SelfController@salary_slip')->name('self.salary_slip');
@@ -141,11 +143,16 @@ Route::namespace('Employee')->prefix('employee')->name('employee.')->middleware(
     Route::post('/task/store', 'TaskController@store')->name('task.store');
     Route::post('/subtask/store', 'TaskController@store_subtask')->name('subtask.store');
     Route::get('/task/detail/{id}', 'TaskController@detail')->name('task.detail');
+    Route::get('/task/export-excel', 'TaskController@export_excel')->name('task.export');
 
     Route::get('/reimbursements', 'ReimbursementController@index')->name('reimbursements.index');
     Route::post('/reimbursements/store', 'ReimbursementController@store')->name('reimbursements.store');
     Route::post('/reimbursements/update/{id}', 'ReimbursementController@update')->name('reimbursements.update');
     Route::get('/reimbursements/export-excel/', 'ReimbursementController@export_excel')->name('reimbursements.export');
     Route::delete('/reimbursements/delete/{id}', 'ReimbursementController@destroy')->name('reimbursements.delete');
+
+    Route::get('/events', [EventController::class, 'index'])->name('events');
+    Route::get('/render', [EventController::class, 'renderEvent'])->name('events.render');
+    Route::post('/eventsAjax', [EventController::class, 'ajax']);
 
 });

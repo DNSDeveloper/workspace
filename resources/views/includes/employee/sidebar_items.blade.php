@@ -1,3 +1,11 @@
+<li class="nav-item">
+    <a href="{{ route('employee.events') }}" class="nav-link">
+        <i style="color: white;opacity:1" class="nav-icon fa fa-calendar"></i>
+        <p style="color: white;opacity: 1;">
+            Events
+        </p>
+    </a>
+</li>
 <li class="nav-item has-treeview">
     <a href="#" class="nav-link">
         <i style="color: white; opacity: 1;" class="nav-icon fa fa-calendar-check-o"></i>
@@ -9,19 +17,13 @@
     </a>
     <ul class="nav nav-treeview">
         <li class="nav-item">
-            <a
-                href="{{ route('employee.attendance.create') }}"
-                class="nav-link"
-            >
+            <a href="{{ route('employee.attendance.create') }}" class="nav-link">
                 <i style="color: white; opacity: 1;" class="far fa-circle nav-icon"></i>
                 <p style="color: white;opacity:1">Absensi Hari ini</p>
             </a>
         </li>
         <li class="nav-item">
-            <a
-                href="{{ route('employee.attendance.index') }}"
-                class="nav-link"
-            >
+            <a href="{{ route('employee.attendance.index') }}" class="nav-link">
                 <i style="color: white; opacity: 1;" class="far fa-circle nav-icon"></i>
                 <p style="color: white;opacity:1">Daftar Absensi</p>
             </a>
@@ -39,19 +41,13 @@
     </a>
     <ul class="nav nav-treeview">
         <li class="nav-item">
-            <a
-            href="{{ route('employee.leaves.create') }}"
-                class="nav-link"
-            >
+            <a href="{{ route('employee.leaves.create') }}" class="nav-link">
                 <i style="color: white; opacity: 1;" class="far fa-circle nav-icon"></i>
                 <p style="color: white;opacity:1">Ajukan Cuti</p>
             </a>
         </li>
         <li class="nav-item">
-            <a
-            href="{{ route('employee.leaves.index') }}"
-                class="nav-link"
-            >
+            <a href="{{ route('employee.leaves.index') }}" class="nav-link">
                 <i style="color: white; opacity: 1;" class="far fa-circle nav-icon"></i>
                 <p style="color: white;opacity:1">Daftar Cuti</p>
             </a>
@@ -69,17 +65,11 @@
     </a>
     <ul class="nav nav-treeview">
         <li class="nav-item">
-            <a
-            href="{{ route('employee.task') }}"
-                class="nav-link"
-            >
+            <a href="{{ route('employee.task') }}" class="nav-link">
                 <i style="color: white; opacity: 1;" class="far fa-circle nav-icon"></i>
                 <p style="color: white;opacity:1">Daftar Task</p>
             </a>
-            <a
-            href="{{ route('employee.task.history') }}"
-                class="nav-link"
-            >
+            <a href="{{ route('employee.task.history') }}" class="nav-link">
                 <i style="color: white; opacity: 1;" class="far fa-circle nav-icon"></i>
                 <p style="color: white;opacity:1">History Task</p>
             </a>
