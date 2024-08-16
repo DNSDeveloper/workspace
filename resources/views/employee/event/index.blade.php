@@ -38,6 +38,39 @@
     </div>
 </section>
 
+<!-- Modal -->
+<div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-labelledby="eventModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eventModalLabel">Add Event</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="eventForm">
+                    <div class="form-group">
+                        <label for="eventTitle">Event Title</label>
+                        <input type="text" class="form-control" id="eventTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventColor">Event Color</label>
+                        <input type="color" class="form-control" id="eventColor" value="#3788d8">
+                    </div>
+                    <input type="hidden" id="eventStart">
+                    <input type="hidden" id="eventEnd">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveEvent">Save Event</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('extra-js')
@@ -46,6 +79,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
@@ -53,137 +87,123 @@
     $(document).ready(function () {
     
     var SITEURL = "{{ url('/') }}";
+    var calendar;
 
-    var cachedEvents = [];
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
 
-    fetchEvents();
-
-        function fetchEvents() {
-        $.ajax({
-            url: SITEURL + "/employee/render",
-            success: function (data) {
-            cachedEvents = data; 
-            renderCalendar(cachedEvents);
+    calendar = $('#calendar').fullCalendar({
+        editable: true,
+        events: SITEURL + "/employee/render",
+        displayEventTime: false,
+        editable: true,
+        resizable: true,
+        droppable: true,
+        eventRender: function (event, element, view) {
+            if (event.allDay === 'true') {
+                event.allDay = true;
+            } else {
+                event.allDay = false;
             }
-        });
-    }
-
-    function renderCalendar(events) {
-        console.log(events)
-        var calendar = $('#calendar').fullCalendar({
-            editable: true,
-            events: events,
-            textColor: 'white',
-            displayEventTime: false,
-            editable: true,
-            resizable: true,
-            droppable: true, 
-            eventColor: 'orange',
-            eventRender: function (event, element, view) {
-                if (event.allDay === 'false') {
-                    event.allDay = true;
-                } 
-            },
-            selectable: true,
-            selectHelper: true,
-            select: function (start, end, allDay) {
-                var title = prompt('Event Title:');
-                if (title) {
-                    var start = $.fullCalendar.formatDate(start, "Y-MM-DD");
-                    var end = $.fullCalendar.formatDate(end, "Y-MM-DD");
-                    $.ajax({
-                        url: SITEURL + "/employee/eventsAjax",
-                        data: {
-                            title: title,
-                            start_date: start,
-                            end_date: end,
-                            type: 'add'
-                        },
-                        type: "POST",
-                        success: function (data) {
-                            displayMessage("Event Created Successfully");
-
-                            calendar.fullCalendar('renderEvent',
-                                {
-                                    id: data.id,
-                                    title: title,
-                                    start: start,
-                                    end: end,
-                                    allDay: allDay
-                                },true);
-
-                            calendar.fullCalendar('unselect');
-                        }
-                    });
-                }
-            },
-            eventDrop: function (event, delta) {
-                var start = $.fullCalendar.formatDate(event.start, "YYYY-MM-DD");
-                var end = $.fullCalendar.formatDate(event.end, "YYYY-MM-DD");
-                console.log("Start Date:", start);
-                console.log("End Date:", end);
+        },
+        selectable: true,
+        selectHelper: true,
+        select: function (start, end, allDay) {
+            $('#eventStart').val($.fullCalendar.formatDate(start, "Y-MM-DD"));
+            $('#eventEnd').val($.fullCalendar.formatDate(end, "Y-MM-DD"));
+            $('#eventModal').modal('show');
+        },
+        eventDrop: function (event, delta) {
+            var start = $.fullCalendar.formatDate(event.start, "YYYY-MM-DD");
+            var end = $.fullCalendar.formatDate(event.end, "YYYY-MM-DD");
+            $.ajax({
+                url: SITEURL + '/employee/eventsAjax',
+                data: {
+                    title: event.title,
+                    start_date: start,
+                    end_date: end,
+                    id: event.id,
+                    type: 'update'
+                },
+                type: "POST",
+                success: function (response) {
+                    displayMessage("Event Updated Successfully");
+                    calendar.fullCalendar('refetchEvents');
+                },
+            });
+        },
+        eventClick: function (event) {
+            var deleteMsg = confirm("Do you really want to delete?");
+            if (deleteMsg) {
                 $.ajax({
+                    type: "POST",
                     url: SITEURL + '/employee/eventsAjax',
                     data: {
-                        title: event.title,
-                        start_date: start,
-                        end_date: end,
-                        id: event.id,
-                        type: 'update'
+                            id: event.id,
+                            type: 'delete'
                     },
-                    type: "POST",
                     success: function (response) {
-                        console.log(response);
-                        displayMessage("Event Updated Successfully");
-                    },
+                        calendar.fullCalendar('removeEvents', event.id);
+                        displayMessage("Event Deleted Successfully");
+                        calendar.fullCalendar('refetchEvents');
+                    }
                 });
-            },
-            eventClick: function (event) {
-                var deleteMsg = confirm("Do you really want to delete?");
-                if (deleteMsg) {
-                    $.ajax({
-                        type: "POST",
-                        url: SITEURL + '/employee/eventsAjax',
-                        data: {
-                                id: event.id,
-                                type: 'delete'
-                        },
-                        success: function (response) {
-                            calendar.fullCalendar('removeEvents', event.id);
-                            displayMessage("Event Deleted Successfully");
-                        }
-                    });
+            }
+        },
+        
+        eventResize: function (event, delta) {
+            var start = $.fullCalendar.formatDate(event.start, "YYYY-MM-DD");
+            var end = $.fullCalendar.formatDate(event.end, "YYYY-MM-DD");
+
+            $.ajax({
+                url: SITEURL + '/employee/eventsAjax',
+                data: {
+                    title: event.title,
+                    start_date: start,
+                    end_date: end,
+                    id: event.id,
+                    type: 'update'
+                },
+                type: "POST",
+                success: function (response) {
+                    displayMessage("Event Updated Successfully");
+                    calendar.fullCalendar('refetchEvents');
+                },
+            });
+        },
+    });
+
+    $('#saveEvent').on('click', function() {
+        var title = $('#eventTitle').val();
+        var color = $('#eventColor').val();
+        var start = $('#eventStart').val();
+        var end = $('#eventEnd').val();
+
+        if (title) {
+            $.ajax({
+                url: SITEURL + "/employee/eventsAjax",
+                data: {
+                    title: title,
+                    start_date: start,
+                    end_date: end,
+                    color: color,
+                    type: 'add'
+                },
+                type: "POST",
+                success: function (data) {
+                    displayMessage("Event Created Successfully");
+                    $('#eventModal').modal('hide');
+                    calendar.fullCalendar('refetchEvents');
+                    $("#eventTitle").val("")
+                    $("#eventColor").val("")
                 }
-            },
-            
-            eventResize: function (event, delta, revertFunc, jsEvent, ui, view) {
-                var start = $.fullCalendar.formatDate(event.start, "YYYY-MM-DD");
-                var end = $.fullCalendar.formatDate(event.end, "YYYY-MM-DD");
-
-                $.ajax({
-                    url: SITEURL + '/employee/eventsAjax',
-                    data: {
-                        title: event.title,
-                        start_date: start,
-                        end_date: end,
-                        id: event.id,
-                        type: 'update'
-                    },
-                    type: "POST",
-                    success: function (response) {
-                        displayMessage("Event Updated Successfully");
-                    },
-                });
-            },
-        })
-    }
-})
-
+            });
+        }
+    });
+});
 
 function displayMessage(message) {
     toastr.success(message, 'Event');

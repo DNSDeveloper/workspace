@@ -54,7 +54,6 @@ class EmployeeController extends Controller
                     if ($endOfWeek->greaterThan($endDate)) {
                         $endOfWeek = $endDate;
                     }
-                    dd($endOfWeek);
                     continue; // Skip minggu ini
                 }
 
@@ -82,7 +81,7 @@ class EmployeeController extends Controller
                     'total' => $totalEarningsThisWeek,
                     'attendance_count' => $totalAttendanceThisWeek,
                     'days_in_week' => $daysInWeek,
-                    'days' => $attendanceByDate, // Detail penghasilan per tanggal dalam seminggu
+                    'days' => $attendanceByDate, 
 
                 ];
             }
@@ -110,7 +109,6 @@ class EmployeeController extends Controller
             $availableSeats = array_diff(range(1,10));
             $randomSeat = array_rand($availableSeats);
             
-dd(range(1,10),rand(1,10),$availableSeats,$randomSeat);
         $uangHarians = $this->kalkulasiUangHarian();
         $data = [
             'employee' => Auth::user()->employee,

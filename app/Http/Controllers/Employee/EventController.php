@@ -22,9 +22,10 @@ class EventController extends Controller
             $events[] = [
                 'id'   => $d->id,
                 'title' => $d->title,
-                'start' => Carbon::parse($d->start_date),
+                'start' => Carbon::parse($d->start_date)->addDay(),
                 'end' => Carbon::parse($d->end_date)->addDay(),
-                'allDay' => true
+                'allDay' => true,
+                'color' => $d->color ?? '#3788d8'   
             ];
         }
         return response()->json($events);
@@ -39,7 +40,8 @@ class EventController extends Controller
                 $event = Event::create([
                     'title' => $request->title,
                     'start_date' => $request->start_date,
-                    'end_date' => $request->end_date,
+                    'end_date' => $request->start_date,
+                    'color' => $request->color,
                 ]);
 
                 return response()->json($event);

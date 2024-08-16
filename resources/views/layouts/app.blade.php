@@ -133,6 +133,24 @@
         .slider.round:before {
             border-radius: 50%;
         }
+
+        .fc-event {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: auto !important;
+            min-height: 60px;
+            line-height: 20px;
+            text-align: center;
+            font-weight: bold;
+            padding: 5px;
+        }
+
+        .fc-title {
+            white-space: normal;
+            color: white;
+            flex: 1;
+        }
     </style>
 </head>
 @guest

@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Reimbursement;
+use App\Attendance;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
@@ -22,10 +23,12 @@ class ReimbursementExport implements FromQuery, WithCustomStartCell, WithEvents,
 
     private $minggu;
     private $employee;
-    public function __construct($minggu, $employee)
+    public function __construct($minggu, $employee, $bulan, $tahun)
     {
         $this->minggu = $minggu;
         $this->employee = $employee;
+        $this->bulan = $bulan;
+        $this->tahun = $tahun;
     }
 
     public function title(): string
@@ -37,12 +40,16 @@ class ReimbursementExport implements FromQuery, WithCustomStartCell, WithEvents,
     {
         $minggu = $this->minggu;
         $employee = $this->employee;
+        $bulan = $this->bulan;
+        $tahun = $this->tahun;
 
         $reimbursements = Reimbursement::query()
             ->where('minggu', $this->minggu)
+            ->whereMonth('created_at', $bulan)
+            ->whereYear('created_at', $tahun)
             ->whereHas('employee', function ($q) use ($employee) {
                 $q->where('first_name', $employee);
-            })->orderBy('jenis','ASC');
+            })->orderBy('jenis', 'ASC')->orderBy('tanggal_reimbursement');
         return $reimbursements;
     }
     public function startCell(): string
@@ -59,6 +66,7 @@ class ReimbursementExport implements FromQuery, WithCustomStartCell, WithEvents,
             'Tgl Transfer',
             'Status',
             'Catetan',
+            'Bukti Pembayaran',
         ];
     }
     public function map($reimbursement): array
@@ -67,10 +75,11 @@ class ReimbursementExport implements FromQuery, WithCustomStartCell, WithEvents,
             $reimbursement->tanggal_reimbursement == null ? '' : date('d M Y', strtotime($reimbursement->tanggal_reimbursement)),
             ucfirst($reimbursement->jenis),
             ucfirst($reimbursement->deskripsi),
-            $reimbursement->nominal == null ? '' : 'Rp ' . number_format($reimbursement->nominal, 0, 0, '.'),
+            $reimbursement->nominal == null ? '' : $reimbursement->nominal,
             $reimbursement->tanggal_transfer == null ? '' : date('d M Y', strtotime($reimbursement->tanggal_transfer)),
             ucfirst($reimbursement->status),
             ucfirst($reimbursement->catetan),
+            'https://workspace.dnstech.co.id/reimbursement/' . $reimbursement->file_employee,
         ];
     }
 
@@ -79,16 +88,38 @@ class ReimbursementExport implements FromQuery, WithCustomStartCell, WithEvents,
     {
         $minggu = $this->minggu;
         $employee = $this->employee;
-        $reimbursementsCount = $reimbursements = Reimbursement::with('employee')->where('minggu', $this->minggu)->whereHas('employee', function ($q) use ($employee) {
-            $q->where('first_name', $employee);
-        })->get();
+        $bulan = $this->bulan;
+        $tahun = $this->tahun;
+
+        $startDate = Carbon::now()->startOfMonth()->addWeeks($minggu - 1)->startOfWeek();
+        $endDate = Carbon::now()->startOfMonth()->addWeeks($minggu - 1)->endOfWeek();
+
+        if ($endDate->month != Carbon::now()->month) {
+            $endDate = Carbon::now()->endOfMonth();
+        }
+
+        $reimbursementsCount = Reimbursement::with('employee')->where('minggu', $this->minggu)
+            ->whereMonth('created_at', $bulan)->whereYear('created_at', $tahun)
+            ->whereHas('employee', function ($q) use ($employee) {
+                $q->where('first_name', $employee);
+            })->get();
+
+        $dailyEarnings = Attendance::whereBetween('created_at', [$startDate, $endDate])
+            ->whereIn('employee_id', [1, 2, 3, 4])
+            ->whereHas('employee', function ($q) use ($employee) {
+                $q->where('first_name', $employee);
+            })->get();
 
         $count = 6 + $reimbursementsCount->count();
-        $bulan = Carbon::now()->isoFormat('MMMM');
+        $countAfterReimburs = $count + 1;
+        $bulan = Carbon::createFromFormat('m', $bulan)->isoFormat('MMMM');
+        $totalDailyEarnings = $dailyEarnings->sum(function ($attendance) {
+            return $attendance->status == 'terlambat' ? 12500 : ($attendance->status == 'hadir' ? 25000 : 0);
+        });
         return [
             BeforeSheet::class => function (BeforeSheet $event) use ($minggu, $bulan, $employee) {
-                $event->sheet->getDelegate()->mergeCells('A1:G1');
-                $event->sheet->getDelegate()->mergeCells('A2:G2');
+                $event->sheet->getDelegate()->mergeCells('A1:H1');
+                $event->sheet->getDelegate()->mergeCells('A2:H2');
                 $event->sheet->getDelegate()->setCellValue('A1', "Rekap Reimbursement Bulan $bulan")
                     ->getStyle('A1')
                     ->getFont()
@@ -113,8 +144,8 @@ class ReimbursementExport implements FromQuery, WithCustomStartCell, WithEvents,
                         ],
                     ],
                 ];
-                $event->sheet->getDelegate()->getStyle('A3:G3')->applyFromArray($styleArray);
-                $event->sheet->getDelegate()->mergeCells('A3:G3');
+                $event->sheet->getDelegate()->getStyle('A3:H3')->applyFromArray($styleArray);
+                $event->sheet->getDelegate()->mergeCells('A3:H3');
 
                 $event->sheet->getDelegate()->getStyle('A3')
                     ->getFill()
@@ -128,26 +159,68 @@ class ReimbursementExport implements FromQuery, WithCustomStartCell, WithEvents,
                     ->getColor()
                     ->setARGB('ffffff');
             },
-            AfterSheet::class => function (AfterSheet $event) use ($count, $reimbursementsCount) {
+            AfterSheet::class => function (AfterSheet $event) use ($count, $reimbursementsCount, $countAfterReimburs, $totalDailyEarnings) {
+                $newCount = $countAfterReimburs + 1;
                 if ($reimbursementsCount->count() > 0) {
-                    $event->sheet->getDelegate()->setCellValue("D$count", "Rp " . number_format($reimbursementsCount->sum('nominal'), 0, 0, '.'))
+                    $event->sheet->getDelegate()->setCellValue("D$count", $reimbursementsCount->sum('nominal'))
                         ->getStyle("D$count")
                         ->getFont()
                         ->setBold(true)
                         ->setSize(12);
-                    $event->sheet->getDelegate()->setCellValue("A$count", "Total")
+
+                    $event->sheet->getDelegate()->setCellValue("A$count", "Total Reimbursement")
                         ->getStyle("A$count")
                         ->getFont()
                         ->setBold(true)
-                        ->setSize(12);
+                        ->setSize(12)
+                        ->setItalic(true);
+
                     $event->sheet->getDelegate()->mergeCells("A$count:C$count");
-                    $event->sheet->getDelegate()
-                        ->getStyle('A')
+                    $event->sheet->getDelegate()->getStyle("A$count:C$count")
                         ->getAlignment()
                         ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)
                         ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
-                    $event->sheet->getDelegate()->getStyle("A$count")->getFont()->setItalic(true);
                 }
+
+                $event->sheet->getDelegate()->setCellValue("A{$countAfterReimburs}", "Total Uang Harian")
+                    ->getStyle("A{$countAfterReimburs}")
+                    ->getFont()
+                    ->setBold(true)
+                    ->setSize(12)
+                    ->setItalic(true);
+
+                $event->sheet->getDelegate()->setCellValue("D$countAfterReimburs", $totalDailyEarnings)
+                    ->getStyle("D$countAfterReimburs")
+                    ->getFont()
+                    ->setBold(true)
+                    ->setSize(12);
+
+                $event->sheet->getDelegate()->mergeCells("A{$countAfterReimburs}:C{$countAfterReimburs}");
+                $event->sheet->getDelegate()->getStyle("A{$countAfterReimburs}:C{$countAfterReimburs}")
+                    ->getAlignment()
+                    ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)
+                    ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+
+
+                $event->sheet->getDelegate()->setCellValue("A{$newCount}", "Total")
+                    ->getStyle("A{$newCount}")
+                    ->getFont()
+                    ->setBold(true)
+                    ->setSize(12)
+                    ->setItalic(true);
+
+                $event->sheet->getDelegate()->setCellValue("D$newCount", $totalDailyEarnings + $reimbursementsCount->sum('nominal'))
+                    ->getStyle("D$newCount")
+                    ->getFont()
+                    ->setBold(true)
+                    ->setSize(12);
+
+                $event->sheet->getDelegate()->mergeCells("A{$newCount}:C{$newCount}");
+                $event->sheet->getDelegate()->getStyle("A{$newCount}:C{$newCount}")
+                    ->getAlignment()
+                    ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)
+                    ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+
 
                 $styleArray = [
                     'borders' => [
@@ -164,6 +237,7 @@ class ReimbursementExport implements FromQuery, WithCustomStartCell, WithEvents,
                 $event->sheet->getDelegate()->getStyle('E4')->applyFromArray($styleArray);
                 $event->sheet->getDelegate()->getStyle('F4')->applyFromArray($styleArray);
                 $event->sheet->getDelegate()->getStyle('G4')->applyFromArray($styleArray);
+                $event->sheet->getDelegate()->getStyle('H4')->applyFromArray($styleArray);
 
                 $event->sheet->getDelegate()->getRowDimension('1')->setRowHeight(30);
                 $event->sheet->getDelegate()->getRowDimension('2')->setRowHeight(30);
@@ -171,30 +245,31 @@ class ReimbursementExport implements FromQuery, WithCustomStartCell, WithEvents,
                 $event->sheet->getDelegate()->getRowDimension('4')->setRowHeight(22);
 
                 $event->sheet->getDelegate()->getColumnDimension('A')->setWidth(20);
-                $event->sheet->getDelegate()->getColumnDimension('B')->setWidth(15);
-                $event->sheet->getDelegate()->getColumnDimension('C')->setWidth(30);
+                $event->sheet->getDelegate()->getColumnDimension('B')->setWidth(20);
+                $event->sheet->getDelegate()->getColumnDimension('C')->setWidth(55);
                 $event->sheet->getDelegate()->getColumnDimension('D')->setWidth(15);
                 $event->sheet->getDelegate()->getColumnDimension('E')->setWidth(15);
                 $event->sheet->getDelegate()->getColumnDimension('F')->setWidth(15);
-                $event->sheet->getDelegate()->getColumnDimension('G')->setWidth(30);
+                $event->sheet->getDelegate()->getColumnDimension('G')->setWidth(25);
+                $event->sheet->getDelegate()->getColumnDimension('H')->setWidth(45);
 
-                $event->sheet->getDelegate()->getStyle('A4:G4')
+                $event->sheet->getDelegate()->getStyle('A4:H4')
                     ->getFont()
                     ->setBold(true)
                     ->setSize(12)
                     ->getColor()
                     ->setARGB('ffffff');
-                $event->sheet->getDelegate()->getStyle('A4:G4')
+                $event->sheet->getDelegate()->getStyle('A4:H4')
                     ->getFill()
                     ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                     ->getStartColor()
                     ->setARGB('3d98d5');
                 $event->sheet->getDelegate()
-                    ->getStyle('A:G')
+                    ->getStyle('A:H')
                     ->getAlignment()
                     ->setWrapText(true);
                 $event->sheet->getDelegate()
-                    ->getStyle('A:G')
+                    ->getStyle('A:H')
                     ->getAlignment()
                     ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP);
                 $event->sheet->getDelegate()
@@ -207,11 +282,11 @@ class ReimbursementExport implements FromQuery, WithCustomStartCell, WithEvents,
                     ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)
                     ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
                 $event->sheet->getDelegate()
-                    ->getStyle('A4:G4')
+                    ->getStyle('A4:H4')
                     ->getAlignment()
                     ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)
                     ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-                $event->sheet->getDelegate()->getStyle('A:G')
+                $event->sheet->getDelegate()->getStyle('A:H')
                     ->getAlignment()
                     ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)
                     ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
